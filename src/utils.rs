@@ -58,6 +58,75 @@ impl<I: Iterator> PushbackIterator for PushbackIter<I>
     { self.pushed_items.push(item); }
 }
 
+pub trait CharByteRead: BufRead
+{
+    fn read_char(&mut self, c: &mut char) -> Result<usize>
+    {
+        let mut char_buf: Vec<u8> = Vec::new();
+        for i in 0..6 {
+            let mut buf: [u8; 1] = [0; 1];
+            let mut is_eof = false;
+            loop {
+                match self.read(&mut buf) {
+                    Ok(0) => {
+                        is_eof = true;
+                        break;
+                    },
+                    Ok(_) => break,
+                    Err(err) if err.kind() == ErrorKind::Interrupted => (),
+                    Err(err) => return Err(err),
+                }
+            }
+            if !is_eof {
+                char_buf.push(buf[0]);
+                match String::from_utf8(char_buf.clone()) {
+                    Ok(string) => {
+                        *c = string.chars().next().unwrap();
+                        return Ok(i + 1);
+                    }
+                    Err(_)     => ()
+                }
+            } else {
+                if i == 0 {
+                    return Ok(0);
+                } else {
+                    return Err(Error::new(ErrorKind::InvalidData, "stream did not contain valid UTF-8"));
+                }
+            }
+        }
+        Err(Error::new(ErrorKind::InvalidData, "stream did not contain valid UTF-8"))
+    }
+}
+
+pub struct CharByteReader<R: BufRead>
+{
+    reader: R,
+}
+
+impl<R: BufRead> CharByteReader<R>
+{
+    pub fn new(reader: R) -> CharByteReader<R>
+    { CharByteReader { reader, } }
+}
+
+impl<R: BufRead> Read for CharByteReader<R>
+{
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize>
+    { self.reader.read(buf) }
+}
+
+impl<R: BufRead> BufRead for CharByteReader<R>
+{
+    fn fill_buf(&mut self) -> Result<&[u8]>
+    { self.reader.fill_buf() }
+    
+    fn consume(&mut self, amt: usize)
+    { self.reader.consume(amt); }
+}
+
+impl<R: BufRead> CharByteRead for CharByteReader<R>
+{}
+
 pub fn escape(chars: &mut PushbackIter<Chars>) -> String
 {
     match chars.next() {
