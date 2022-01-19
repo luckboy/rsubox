@@ -43,7 +43,7 @@ fn get_applet_name_and_args() -> Option<(String, Vec<String>)>
 fn main()
 {
     let mut applet_funs = HashMap::new();
-    init_applet_funs(&mut applet_funs);
+    initialize_applet_funs(&mut applet_funs);
     match get_applet_name_and_args() {
         Some((applet_name, args)) => {
             match applet_funs.get(&applet_name) {

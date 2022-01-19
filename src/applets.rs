@@ -22,7 +22,7 @@ pub mod echo;
 
 type AppletFunction = fn(&[String]) -> i32;
 
-pub fn init_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
+pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
 {
     applet_funs.insert(String::from("cat"), cat::main);
     applet_funs.insert(String::from("echo"), echo::main);
