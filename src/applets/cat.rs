@@ -53,7 +53,7 @@ pub fn main(args: &[String]) -> i32
         }
     }
     let mut status = 0;
-    let args: Vec<String> = args.iter().skip(opts.index()).map(|a| a.clone()).collect();
+    let args: Vec<&String> = args.iter().skip(opts.index()).collect();
     if !args.is_empty() {
         for arg in args {
             if !cat_file(arg) { status = 1; }
