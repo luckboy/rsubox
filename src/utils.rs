@@ -15,8 +15,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+use std::char;
 use std::io::*;
 use std::path::*;
+use std::str::*;
+
+pub fn escape(chars: &mut Chars) -> String
+{
+    match chars.next() {
+        Some('a')  => String::from("\x07"),
+        Some('b')  => String::from("\x08"),
+        Some('c')  => String::new(),
+        Some('f')  => String::from("\x0c"),
+        Some('n')  => String::from("\n"),
+        Some('r')  => String::from("\r"),
+        Some('t')  => String::from("\t"),
+        Some('v')  => String::from("\x0b"),
+        Some('\\') => String::from("\\"),
+        Some('0')  => {
+            let mut tmp_chars = chars.clone();
+            let mut digits = String::from("0");
+            for _ in 0..3 {
+                match chars.next() {
+                    Some(c @ ('0'..='7')) => {
+                        digits.push(c);
+                        tmp_chars = chars.clone();
+                    }
+                    Some(_) => *chars = tmp_chars.clone(),
+                    None => (),
+                }
+            }
+            match char::from_u32(u32::from_str_radix(digits.as_str(), 8).unwrap()) {
+                Some(c) => format!("{}", c),
+                None    => format!("{}", char::REPLACEMENT_CHARACTER),
+            }
+        },
+        Some(c)    => format!("\\{}", c),
+        None       => String::new(),
+    }
+}
 
 pub fn copy_stream<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Path>, out_path: Option<&Path>) -> bool
 {
