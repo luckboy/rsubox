@@ -31,7 +31,6 @@ fn echo(arg: &String)
 
 pub fn main(args: &[String]) -> i32
 {
-    let mut is_first = true;
     let mut arg_iter = args.iter().skip(1);
     let is_newline = if let Some("-n") = arg_iter.next().map(|a| a.as_str()) {
         false
@@ -39,6 +38,7 @@ pub fn main(args: &[String]) -> i32
         arg_iter = args.iter().skip(1);
         true
     };
+    let mut is_first = true;
     for arg in arg_iter {
       if !is_first { print!(" "); }
       echo(arg);
