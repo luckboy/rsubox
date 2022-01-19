@@ -15,19 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-use std::collections::HashMap;
+use crate::utils::*;
 
-pub mod basename;
-pub mod cat;
-pub mod dirname;
-pub mod echo;
-
-type AppletFunction = fn(&[String]) -> i32;
-
-pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
-{
-    applet_funs.insert(String::from("basename"), basename::main);
-    applet_funs.insert(String::from("cat"), cat::main);
-    applet_funs.insert(String::from("dirname"), dirname::main);
-    applet_funs.insert(String::from("echo"), echo::main);
+pub fn main(args: &[String]) -> i32 {
+    match args.get(1) {
+        Some(path) => {
+            if args.len() > 3 {
+                eprintln!("Too more arguments");
+                return 1;
+            }
+            let suffix = args.get(2).map(|a| a.as_str());
+            let (_, base_name) = dir_name_and_base_name(path.as_str(), suffix);
+            println!("{}", base_name);
+            0
+        },
+        None => {
+            eprintln!("No few arguments");
+            1
+        }
+    }
 }

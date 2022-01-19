@@ -17,6 +17,7 @@
 //
 use std::char;
 use std::io::*;
+use std::path;
 use std::path::*;
 use std::str::*;
 
@@ -53,6 +54,26 @@ pub fn escape(chars: &mut Chars) -> String
         Some(c)    => format!("\\{}", c),
         None       => String::new(),
     }
+}
+
+pub fn dir_name_and_base_name(path: &str, suffix: Option<&str>) -> (String, String)
+{
+    let (dir_name, base_name) = match path.trim_end_matches(path::MAIN_SEPARATOR).rsplit_once(path::MAIN_SEPARATOR) {
+        Some((tmp_dir_name, tmp_base_name)) => {
+            let mut dir_name = String::from(tmp_dir_name.trim_end_matches(path::MAIN_SEPARATOR));
+            if dir_name.is_empty() && path.starts_with(path::MAIN_SEPARATOR) {
+                dir_name = String::new();
+                dir_name.push(path::MAIN_SEPARATOR);
+            }
+            (dir_name, String::from(tmp_base_name)) 
+        },
+        None => (String::from("."), String::from(path)),
+    };
+    let base_name = match suffix {
+        Some(suffix) if base_name.ends_with(suffix) => String::from(&base_name[0..(base_name.len() - suffix.len())]),
+        Some(_) | None => base_name,
+    };
+    (dir_name, base_name)
 }
 
 pub fn copy_stream<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Path>, out_path: Option<&Path>) -> bool
