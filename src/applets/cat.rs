@@ -37,9 +37,9 @@ fn cat_file<P: AsRef<Path>>(path: P) -> bool
 
 pub fn main(args: &[String]) -> i32
 {
-    let mut opts = getopt::Parser::new(args, "u");
+    let mut opt_parser = getopt::Parser::new(args, "u");
     loop {
-        match opts.next() {
+        match opt_parser.next() {
             Some(Ok(Opt('u', _))) => (),
             Some(Ok(Opt(c, _))) => {
                 eprintln!("unknown option -- {:?}", c);
@@ -53,9 +53,9 @@ pub fn main(args: &[String]) -> i32
         }
     }
     let mut status = 0;
-    let paths: Vec<&String> = args.iter().skip(opts.index()).collect();
+    let paths: Vec<&String> = args.iter().skip(opt_parser.index()).collect();
     if !paths.is_empty() {
-        for path in paths {
+        for path in &paths {
             if !cat_file(path) { status = 1; }
         }
     } else {
