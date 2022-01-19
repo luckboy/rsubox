@@ -53,10 +53,10 @@ pub fn main(args: &[String]) -> i32
         }
     }
     let mut status = 0;
-    let args: Vec<&String> = args.iter().skip(opts.index()).collect();
-    if !args.is_empty() {
-        for arg in args {
-            if !cat_file(arg) { status = 1; }
+    let paths: Vec<&String> = args.iter().skip(opts.index()).collect();
+    if !paths.is_empty() {
+        for path in paths {
+            if !cat_file(path) { status = 1; }
         }
     } else {
         if cat(&mut stdin(), None) { status = 1; }
