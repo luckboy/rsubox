@@ -19,7 +19,7 @@ use crate::utils::*;
 
 fn echo(arg: &String)
 {
-    let mut chars = arg.chars();
+    let mut chars = PushbackIter::new(arg.chars());
     loop {
         match chars.next() {
             Some('\\') => print!("{}", escape(&mut chars)),

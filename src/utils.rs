@@ -17,11 +17,48 @@
 //
 use std::char;
 use std::io::*;
+use std::iter::Iterator;
 use std::path;
 use std::path::*;
 use std::str::*;
 
-pub fn escape(chars: &mut Chars) -> String
+pub trait PushbackIterator: Iterator
+{
+    fn undo(&mut self, item: Self::Item);
+}
+
+pub struct PushbackIter<I: Iterator>
+{
+    iter: I,
+    pushed_items: Vec<I::Item>,
+}
+
+impl<I: Iterator> PushbackIter<I>
+{
+    pub fn new(iter: I) -> PushbackIter<I>
+    { PushbackIter { iter, pushed_items: Vec::new(), } }
+}
+
+impl<I: Iterator> Iterator for PushbackIter<I>
+{
+    type Item = I::Item;
+    
+    fn next(&mut self) -> Option<I::Item>
+    {
+        match self.pushed_items.pop() {
+            Some(item) => Some(item),
+            None       => self.iter.next(),
+        }
+    }
+}
+
+impl<I: Iterator> PushbackIterator for PushbackIter<I>
+{
+    fn undo(&mut self, item: Self::Item)
+    { self.pushed_items.push(item); }
+}
+
+pub fn escape(chars: &mut PushbackIter<Chars>) -> String
 {
     match chars.next() {
         Some('a')  => String::from("\x07"),
@@ -34,15 +71,13 @@ pub fn escape(chars: &mut Chars) -> String
         Some('v')  => String::from("\x0b"),
         Some('\\') => String::from("\\"),
         Some('0')  => {
-            let mut tmp_chars = chars.clone();
             let mut digits = String::from("0");
             for _ in 0..3 {
                 match chars.next() {
                     Some(c @ ('0'..='7')) => {
                         digits.push(c);
-                        tmp_chars = chars.clone();
                     }
-                    Some(_) => *chars = tmp_chars.clone(),
+                    Some(c) => chars.undo(c),
                     None => (),
                 }
             }
