@@ -52,7 +52,7 @@ pub fn escape(chars: &mut Chars) -> String
             }
         },
         Some(c)    => format!("\\{}", c),
-        None       => String::new(),
+        None       => String::from("\\"),
     }
 }
 
