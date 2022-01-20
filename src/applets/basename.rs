@@ -21,7 +21,7 @@ pub fn main(args: &[String]) -> i32 {
     match args.get(1) {
         Some(path) => {
             if args.len() > 3 {
-                eprintln!("Too more arguments");
+                eprintln!("Too many arguments");
                 return 1;
             }
             let suffix = args.get(2).map(|a| a.as_str());

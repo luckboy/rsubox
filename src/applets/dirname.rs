@@ -21,7 +21,7 @@ pub fn main(args: &[String]) -> i32 {
     match args.get(1) {
         Some(path) => {
             if args.len() > 2 {
-                eprintln!("Too more arguments");
+                eprintln!("Too many arguments");
                 return 1;
             }
             let (dir_name, _) = dir_name_and_base_name(path.as_str(), None);
