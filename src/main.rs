@@ -46,6 +46,18 @@ fn main()
     initialize_applet_funs(&mut applet_funs);
     match get_applet_name_and_args() {
         Some((applet_name, args)) => {
+            if applet_name == String::from("applets") {
+                let mut applet_names: Vec<&String> = applet_funs.iter().map(|a| a.0).collect();
+                applet_names.sort();
+                let mut is_first = true;
+                for applet_name in &applet_names {
+                    if !is_first { print!(" "); } 
+                    print!("{}", applet_name);
+                    is_first = false;
+                }
+                println!("");
+                exit(0);
+            }
             match applet_funs.get(&applet_name) {
                 Some(applet_fun) => exit(applet_fun(&args)),
                 None             => {
