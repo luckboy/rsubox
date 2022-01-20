@@ -24,7 +24,7 @@ use std::process::*;
 mod applets;
 mod utils;
 
-use applets::*;
+use applets::initialize_applet_funs;
 
 fn get_applet_name_and_args() -> Option<(String, Vec<String>)>
 {
