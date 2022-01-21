@@ -59,7 +59,7 @@ pub fn main(args: &[String]) -> i32
             if !cat_file(path) { status = 1; }
         }
     } else {
-        if cat(&mut stdin(), None) { status = 1; }
+        if !cat(&mut stdin(), None) { status = 1; }
     }
     status
 }

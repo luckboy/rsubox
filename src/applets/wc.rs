@@ -172,7 +172,7 @@ pub fn main(args: &[String]) -> i32
             print_counts(&total_counts, Some("total"), &opts);
         }
     } else {
-        if wc(&mut stdin(), None, &opts, &mut total_counts) { status = 1; }
+        if !wc(&mut stdin(), None, &opts, &mut total_counts) { status = 1; }
     }
     status
 }
