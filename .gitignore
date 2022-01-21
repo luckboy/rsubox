@@ -1,2 +1,5 @@
 /target
+/test_root
+/test_tmp
+/test_counts
 /Cargo.lock
