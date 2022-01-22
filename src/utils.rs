@@ -146,7 +146,10 @@ pub fn escape(chars: &mut PushbackIter<Chars>) -> String
                     Some(c @ ('0'..='7')) => {
                         digits.push(c);
                     }
-                    Some(c) => chars.undo(c),
+                    Some(c) => {
+                        chars.undo(c);
+                        break;
+                    },
                     None => (),
                 }
             }
