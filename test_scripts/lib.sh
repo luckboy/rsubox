@@ -83,6 +83,11 @@ assert_non_existent_file() {
     assert "$1" [ ! -e "$2" ]
 }
 
+# Usage: assert_existent_file <assert name> <file>
+assert_existent_file() {
+    assert "$1" [ -e "$2" ]
+}
+
 # Usage: assert_compare_files <assert name> <file1> <file2>
 assert_compare_files() {
     cmp "$2" "$3" > /dev/null 2> /dev/null
@@ -99,6 +104,12 @@ assert_file_content() {
 assert_file_content_pattern() {
     grep "$2" "$3" > /dev/null 2>/dev/null
     assert "$1" [ 0 = "$?" ]
+}
+
+# Usage: assert_file_line_count <assert name> <number of lines> <file>
+assert_file_line_count() {
+    _line_count="`wc -l "$3" | awk '{ print $1; }'`"
+    assert "$1" [ "$2" = "$_line_count" ]
 }
 
 read_file_line() {
