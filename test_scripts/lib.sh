@@ -29,13 +29,13 @@ end_test_suites() {
     _passed_count="`cat test_counts/passed_count.txt`"
     _failed_count="`cat test_counts/failed_count.txt`"
     _total_count="`expr "$_passed_count" + "$_failed_count"`"
-    printf "Test result: %d total, %d passed, %d failed\n" "$_total_count" "$_passed_count" "$_failed_count"
+    printf 'Test result: %d total, %d passed, %d failed\n' "$_total_count" "$_passed_count" "$_failed_count"
     rm -fr test_counts
 }
 
 # Usage: start_test <test suite name> <test description>
 start_test() {
-    printf "Test: %s: %s ..." "$1" "$2"
+    printf 'Test: %s: %s ...' "$1" "$2"
     rm -fr test_root test_tmp
     rm -f test_counts/failed.txt
     mkdir test_root test_tmp
@@ -62,7 +62,7 @@ assert() {
     $* > /dev/null 2> /dev/null
     _status="$?"
     if [ "$_status" != 0 ]; then
-        printf "fail assertion %s\n" "$_assert_name"
+        printf 'fail assertion %s\n' "$_assert_name"
         echo "stdout:"
         cat ../test_tmp/stdout.txt
         echo
@@ -96,7 +96,7 @@ assert_compare_files() {
 
 # Usage: assert_file_content <assert name> <content> <file>
 assert_file_content() {
-    printf "%s\n" "$2" | cmp - "$3" > /dev/null 2>/dev/null
+    printf '%s\n' "$2" | cmp - "$3" > /dev/null 2>/dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
@@ -132,7 +132,7 @@ assert_file_line_pattern() {
 # Usage: asseet_file_mode <assert name> <pattern> <file>
 assert_file_mode() {
     _mode="`ls -ld "$3" 2> /dev/null | awk '{ print $1; }'`"
-    printf "%s\n" "$_mode" | grep "$2" > /dev/null 2> /dev/null
+    printf '%s\n' "$_mode" | grep "$2" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
@@ -163,14 +163,14 @@ assert_file_size() {
 # Usage: assert_file_atime <assert name> <pattern> <file>
 assert_file_atime() {
     _atime="`ls -ldu "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
-    printf "%s\n" "$_atime" | grep "$2" > /dev/null 2> /dev/null
+    printf '%s\n' "$_atime" | grep "$2" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: <assert name> <pattern> <file>
 assert_file_mtime() {
     _mtime="`ls -ldc "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
-    printf "%s\n" "$_mtime" | grep "$2" > /dev/null 2> /dev/null
+    printf '%s\n' "$_mtime" | grep "$2" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
