@@ -119,12 +119,13 @@ read_file_line() {
 # Usage: assert_file_line <assert name> <number of line> <line> <file>
 assert_file_line() {
     _line="`read_file_line "$4" "$2"`"
-    assert "$1" [ "$3" = "$_line" ]
+    [ "$3" = "$_line" ]
+    assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: assert_file_line_pattern <assert name> <number of line> <pattern> <file>
 assert_file_line_pattern() {
-    read_file_line "$4" "$2" | grep "$3" > /dev/null 2>/dev/null
+    read_file_line "$4" "$2" | grep "$3" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
