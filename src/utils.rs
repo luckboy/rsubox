@@ -174,7 +174,15 @@ pub fn dir_name_and_base_name(path: &str, suffix: Option<&str>) -> (String, Stri
             }
             (dir_name, String::from(tmp_base_name)) 
         },
-        None => (String::from("."), String::from(path)),
+        None => {
+            let mut dir_name = String::new();
+            if path.starts_with(path::MAIN_SEPARATOR) {
+                dir_name.push(path::MAIN_SEPARATOR);
+            } else {
+                dir_name.push('.');
+            }
+            (dir_name, String::from(path))
+        },
     };
     let base_name = match suffix {
         Some(suffix) if base_name.ends_with(suffix) => String::from(&base_name[0..(base_name.len() - suffix.len())]),

@@ -29,7 +29,7 @@ pub fn main(args: &[String]) -> i32 {
             0
         },
         None => {
-            eprintln!("No few arguments");
+            eprintln!("Too few arguments");
             1
         }
     }

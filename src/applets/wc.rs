@@ -47,14 +47,26 @@ struct Counts
 fn print_counts(counts: &Counts, path: Option<&str>, opts: &Options)
 {
     let mut is_first = true;
-    if opts.newline_flag { print!("{}", counts.newline_count); is_first = false; }
-    if !is_first { print!(" "); }
-    if opts.newline_flag { print!("{}", counts.word_count); is_first = false; }
-    if !is_first { print!(" "); }
+    if opts.newline_flag { 
+        print!("{}", counts.newline_count);
+        is_first = false;
+    }
+    if opts.word_flag {
+        if !is_first { print!(" "); }
+        print!("{}", counts.word_count);
+        is_first = false;
+    }
     match opts.byte_or_char_flag {
         ByteOrCharFlag::None  => (),
-        ByteOrCharFlag::Bytes => { print!("{}", counts.byte_count); is_first = false; },
-        ByteOrCharFlag::Chars => { print!("{}", counts.char_count); is_first = false; },
+        ByteOrCharFlag::Bytes => { 
+             if !is_first { print!(" "); }
+            print!("{}", counts.byte_count); is_first = false;
+        },
+        ByteOrCharFlag::Chars => {
+            if !is_first { print!(" "); }
+            print!("{}", counts.char_count);
+            is_first = false;
+        },
     }
     match path {
         Some(path) => {
