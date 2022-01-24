@@ -1,4 +1,3 @@
-#!/bin/sh
 #
 # Rsubox - Rust single unix utilities in one executable.
 # Copyright (C) 2022 Łukasz Szpakowski
@@ -16,18 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-if [ "$RSUBOX" = "" ]; then
-    RSUBOX=target/debug/rsubox
-fi
+start_test false "false returns non-zero value"
+    "../$RSUBOX" false > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-. ./test_scripts/lib.sh
-
-start_test_suites
-. ./test_scripts/basename_tests.sh
-. ./test_scripts/cat_tests.sh
-. ./test_scripts/dirname_tests.sh
-. ./test_scripts/echo_tests.sh
-. ./test_scripts/false_tests.sh
-. ./test_scripts/true_tests.sh
-. ./test_scripts/wc_tests.sh
-end_test_suites
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
