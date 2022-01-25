@@ -19,6 +19,7 @@ use std::collections::HashMap;
 
 pub mod basename;
 pub mod cat;
+pub mod cp;
 pub mod dirname;
 pub mod echo;
 pub mod r#false;
@@ -31,6 +32,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
 {
     applet_funs.insert(String::from("basename"), basename::main);
     applet_funs.insert(String::from("cat"), cat::main);
+    applet_funs.insert(String::from("cp"), cp::main);
     applet_funs.insert(String::from("dirname"), dirname::main);
     applet_funs.insert(String::from("echo"), echo::main);
     applet_funs.insert(String::from("false"), r#false::main);
