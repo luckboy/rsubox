@@ -101,11 +101,7 @@ fn cp_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metad
             let mut is_success = if src_metadata.file_type().is_file() {
                 copy_file(src_path.as_ref(), dst_path.as_ref()) 
             } else if src_metadata.file_type().is_symlink() {
-                if opts.recursive_flag {
-                    copy_symlink(src_path.as_ref(), dst_path.as_ref())
-                } else {
-                    copy_file(src_path.as_ref(), dst_path.as_ref())
-                }
+                copy_symlink(src_path.as_ref(), dst_path.as_ref())
             } else {
                 if opts.recursive_flag {
                     mknod_for_copy(dst_path.as_ref(), src_metadata)
@@ -178,11 +174,11 @@ pub fn main(args: &[String]) -> i32
                 } else {
                     Some(dst_path_buf)
                 };
-                let mut dst_metadata: Result<fs::Metadata> = Err(Error::new(ErrorKind::NotFound, "No such file or directory"));
+                let mut dst_metadata_stack: Vec<Result<fs::Metadata>> = Vec::new();
                 match dst_path_buf {
                     Some(mut dst_path_buf) => {
                         let dst_path_buf_r = &mut dst_path_buf;
-                        let dst_metadata_r = &mut dst_metadata;
+                        let dst_metadata_stack_r = &mut dst_metadata_stack;
                         let is_success = if opts.recursive_flag {
                             recursively_do(src_path, opts.do_flag, &mut (|src_path, src_metadata, name, action| {
                                     match action {
@@ -191,13 +187,13 @@ pub fn main(args: &[String]) -> i32
                                                 Some(name) => dst_path_buf_r.push(name),
                                                 None       => (),
                                             }
-                                            *dst_metadata_r = fs::metadata(dst_path_buf_r.as_path());
+                                            dst_metadata_stack_r.push(fs::metadata(dst_path_buf_r.as_path()));
                                         },
                                         _ => (),
                                     };
                                     let is_success = match action {
                                         DoAction::DirActionBeforeList => {
-                                            match dst_metadata_r {
+                                            match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                                 Ok(dst_metadata) => {
                                                     if !dst_metadata.file_type().is_dir() {
                                                         eprintln!("{}: Not a directory", dst_path_buf_r.as_path().to_string_lossy());
@@ -216,7 +212,7 @@ pub fn main(args: &[String]) -> i32
                                             }
                                         },
                                         DoAction::FileAction => {
-                                            match dst_metadata_r {
+                                            match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                                 Ok(dst_metadata) => {
                                                     cp_file(src_path, src_metadata, dst_path_buf_r.as_path(), Some(&dst_metadata), &opts)
                                                 },
@@ -233,6 +229,7 @@ pub fn main(args: &[String]) -> i32
                                     };
                                     match action {
                                         DoAction::FileAction | DoAction::DirActionAfterList => {
+                                            dst_metadata_stack_r.pop();
                                             match name {
                                                 Some(_) => { dst_path_buf_r.pop(); () },
                                                 None    => (),
@@ -244,8 +241,8 @@ pub fn main(args: &[String]) -> i32
                             }))
                         } else {
                             non_recursively_do(src_path, opts.do_flag, &mut (|src_path, src_metadata| {
-                                    *dst_metadata_r = fs::metadata(dst_path_buf_r.as_path());
-                                    match dst_metadata_r {
+                                    dst_metadata_stack_r.push(fs::metadata(dst_path_buf_r.as_path()));
+                                    let is_success = match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                         Ok(dst_metadata) => {
                                             cp_file(src_path, src_metadata, dst_path_buf_r.as_path(), Some(&dst_metadata), &opts)
                                         },
@@ -256,7 +253,9 @@ pub fn main(args: &[String]) -> i32
                                              eprintln!("{}: {}", dst_path_buf_r.as_path().to_string_lossy(), err);
                                              false
                                         },
-                                    }
+                                    };
+                                    dst_metadata_stack_r.pop();
+                                    is_success
                             }))
                         };
                         if !is_success { status = 1; }
