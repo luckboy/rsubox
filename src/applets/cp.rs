@@ -70,8 +70,8 @@ fn are_same_files(metadata1: &fs::Metadata, metadata2: Option<&fs::Metadata>) ->
 fn ask<P: AsRef<Path>>(dst_path: P) -> bool
 {
     loop {
-        print!("override {}? ", dst_path.as_ref().to_string_lossy());
-        match stdout().flush() {
+        eprint!("override {}? ", dst_path.as_ref().to_string_lossy());
+        match stderr().flush() {
             Ok(()) => {
                 let mut line = String::new();
                 match stdin().read_line(&mut line) {
