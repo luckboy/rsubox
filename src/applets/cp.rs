@@ -227,8 +227,8 @@ pub fn main(args: &[String]) -> i32
                                         },
                                         DoAction::DirActionAfterList => preserve(src_metadata, dst_path_buf_r.as_path()),
                                     };
-                                    match action {
-                                        DoAction::FileAction | DoAction::DirActionAfterList => {
+                                    match (action, is_success) {
+                                        (DoAction::FileAction | DoAction::DirActionAfterList, _) | (_, false) => {
                                             dst_metadata_stack_r.pop();
                                             match name {
                                                 Some(_) => { dst_path_buf_r.pop(); () },
