@@ -237,7 +237,7 @@ pub fn main(args: &[String]) -> i32
                                         },
                                         _ => (),
                                     }
-                                    is_success
+                                    (is_success, true)
                             }))
                         } else {
                             non_recursively_do(src_path, opts.do_flag, &mut (|src_path, src_metadata| {

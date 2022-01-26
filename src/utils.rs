@@ -472,7 +472,7 @@ pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, f: &mut F) -
 }
 
 fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: Option<&OsStr>, f: &mut F) -> bool
-  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> bool
+  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let metadata = match (flag, name) {
         (DoFlag::NoDereference, _) => fs::symlink_metadata(path_buf.as_path()),
@@ -483,10 +483,10 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: O
     match metadata {
         Ok(metadata) => {
             if !metadata.file_type().is_dir() {
-                f(path_buf.as_path(), &metadata, name, DoAction::FileAction)
+                f(path_buf.as_path(), &metadata, name, DoAction::FileAction).0
             } else {
-                let mut is_success = f(path_buf.as_path(), &metadata, name, DoAction::DirActionBeforeList);
-                if is_success {
+                let (mut is_success, is_descent) = f(path_buf.as_path(), &metadata, name, DoAction::DirActionBeforeList);
+                if is_success && is_descent {
                     match read_dir(path_buf.as_path()) {
                         Ok(entries) => {
                             for entry in entries {
@@ -509,10 +509,10 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: O
                             is_success = false;
                         },
                     }
-                    is_success &= f(path_buf, &metadata, name, DoAction::DirActionAfterList);
+                    is_success &= f(path_buf, &metadata, name, DoAction::DirActionAfterList).0;
                     is_success
                 } else {
-                    false
+                    is_success
                 }
             }
         },
@@ -524,7 +524,7 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: O
 }
 
 pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, f: &mut F) -> bool
-  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> bool
+  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let mut path_buf = path.as_ref().to_path_buf();
     recursively_do_from_path_buf(&mut path_buf, flag, None, f)
