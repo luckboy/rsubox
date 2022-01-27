@@ -23,6 +23,7 @@ pub mod cp;
 pub mod dirname;
 pub mod echo;
 pub mod r#false;
+pub mod rm;
 pub mod r#true;
 pub mod wc;
 
@@ -36,6 +37,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("dirname"), dirname::main);
     applet_funs.insert(String::from("echo"), echo::main);
     applet_funs.insert(String::from("false"), r#false::main);
+    applet_funs.insert(String::from("rm"), rm::main);
     applet_funs.insert(String::from("true"), r#true::main);
     applet_funs.insert(String::from("wc"), wc::main);
 }

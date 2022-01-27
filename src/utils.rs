@@ -391,6 +391,33 @@ pub fn mknod_for_copy<P: AsRef<Path>>(path: P, metadata: &fs::Metadata) -> bool
     }
 }
 
+pub fn access_for_remove<P: AsRef<Path>>(path: P, is_success: &mut bool) -> bool
+{
+    match access(path.as_ref(), libc::W_OK) {
+        Ok(is_access) => is_access,
+        Err(err)      => {
+            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
+            *is_success = false;
+            false
+        },
+    }
+}
+
+pub fn access<P: AsRef<Path>>(path: P, mode: i32) -> Result<bool>
+{
+    let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
+    let res = unsafe { libc::access(path_cstring.as_ptr(), mode) };
+    if res != -1 {
+        Ok(true)
+    } else {
+        let err = Error::last_os_error();
+        match err.raw_os_error() {
+            Some(os_err) if os_err == libc::EACCES => Ok(false),
+            _ => Err(err),
+        }
+    }
+}
+
 pub fn mknod<P: AsRef<Path>>(path: P, mode: u32, dev: dev_t) -> Result<()>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
@@ -447,6 +474,16 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 
 pub fn umask(mask: u32) -> u32 
 { unsafe { libc::umask(mask) } }
+
+pub fn isatty(fd: i32) -> Result<bool>
+{
+    let res = unsafe { libc::isatty(fd) };
+    if res != -1 {
+        Ok(res != 0)
+    } else {
+        Err(Error::last_os_error())
+    }    
+}
 
 pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata) -> bool
