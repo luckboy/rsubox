@@ -573,3 +573,22 @@ pub fn get_dest_path_and_dir_flag<'a>(paths: &mut Vec<&'a String>) -> Option<(&'
         None
     }
 }
+
+pub fn ask_for_path<P: AsRef<Path>>(s: &str, path: P) -> bool
+{
+    loop {
+        eprint!("{} {}? ", s, path.as_ref().to_string_lossy());
+        match stderr().flush() {
+            Ok(()) => {
+                let mut line = String::new();
+                match stdin().read_line(&mut line) {
+                    Ok(_)    => {
+                        break line.trim().to_lowercase() == String::from("yes") || line.trim().to_lowercase() == String::from("y");
+                    },
+                    Err(err) => eprintln!("{}", err),
+                }
+            },
+            Err(err) => eprintln!("{}", err),
+        }
+    }
+}

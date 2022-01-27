@@ -67,31 +67,12 @@ fn are_same_files(metadata1: &fs::Metadata, metadata2: Option<&fs::Metadata>) ->
     }
 }
 
-fn ask<P: AsRef<Path>>(dst_path: P) -> bool
-{
-    loop {
-        eprint!("override {}? ", dst_path.as_ref().to_string_lossy());
-        match stderr().flush() {
-            Ok(()) => {
-                let mut line = String::new();
-                match stdin().read_line(&mut line) {
-                    Ok(_)    => {
-                        break line.trim().to_lowercase() == String::from("yes") || line.trim().to_lowercase() == String::from("y");
-                    },
-                    Err(err) => eprintln!("{}", err),
-                }
-            },
-            Err(err) => eprintln!("{}", err),
-        }
-    }
-}
-
 fn cp_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metadata, dst_path: Q, dst_metadata: Option<&fs::Metadata>, opts: &Options) -> bool
 {
     if !are_same_files(src_metadata, dst_metadata) {
         let answer = if opts.interactive_flag {
             match dst_metadata {
-                Some(_) => ask(dst_path.as_ref()),
+                Some(_) => ask_for_path("override", dst_path.as_ref()),
                 None    => true
             }
         } else {
