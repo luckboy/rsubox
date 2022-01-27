@@ -448,7 +448,7 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 pub fn umask(mask: u32) -> u32 
 { unsafe { libc::umask(mask) } }
 
-pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, f: &mut F) -> bool
+pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata) -> bool
 {
     let metadata = match flag {
@@ -465,13 +465,17 @@ pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, f: &mut F) -
             }
         },
         Err(err) => {
-            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
-            false
+            if !is_err_for_not_found && err.kind() == ErrorKind::NotFound {
+                true
+            } else {
+                eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
+                false
+            }
         },
     }
 }
 
-fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: Option<&OsStr>, f: &mut F) -> bool
+fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, is_err_for_not_found: bool, name: Option<&OsStr>, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let metadata = match (flag, name) {
@@ -493,7 +497,7 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: O
                                 match entry {
                                     Ok(entry) => {
                                         path_buf.push(entry.file_name());
-                                        is_success &= recursively_do_from_path_buf(path_buf, flag, Some(entry.file_name().as_os_str()), f);
+                                        is_success &= recursively_do_from_path_buf(path_buf, flag, true, Some(entry.file_name().as_os_str()), f);
                                         path_buf.pop();
                                     },
                                     Err(err) => {
@@ -517,17 +521,21 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, name: O
             }
         },
         Err(err) => {
-            eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
-            false
+            if !is_err_for_not_found && err.kind() == ErrorKind::NotFound {
+                true
+            } else {
+                eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                false
+            }
         },
     }
 }
 
-pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, f: &mut F) -> bool
+pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let mut path_buf = path.as_ref().to_path_buf();
-    recursively_do_from_path_buf(&mut path_buf, flag, None, f)
+    recursively_do_from_path_buf(&mut path_buf, flag, is_err_for_not_found, None, f)
 }
 
 pub fn get_dest_path_and_dir_flag<'a>(paths: &mut Vec<&'a String>) -> Option<(&'a String, bool)>
