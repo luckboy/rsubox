@@ -429,12 +429,12 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
     let tmp_times = [
        libc::timeval {
-           tv_sec: times.atime.sec,
-           tv_usec: times.atime.usec,
+           tv_sec: times.atime.sec as libc::time_t,
+           tv_usec: times.atime.usec as libc::suseconds_t,
        },
        libc::timeval {
-           tv_sec: times.mtime.sec,
-           tv_usec: times.mtime.usec,
+           tv_sec: times.mtime.sec as libc::time_t,
+           tv_usec: times.mtime.usec as libc::suseconds_t,
        }
     ];
     let res = unsafe { libc::utimes(path_cstring.as_ptr(), &tmp_times as *const libc::timeval) };
