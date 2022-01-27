@@ -504,7 +504,7 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, is_err_
                                         eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
                                         is_success = false;
                                         break;
-                                    }
+                                    },
                                 }
                             }
                         },
