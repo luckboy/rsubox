@@ -72,7 +72,7 @@ fn cp_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metad
     if !are_same_files(src_metadata, dst_metadata) {
         let answer = if opts.interactive_flag {
             match dst_metadata {
-                Some(_) => ask_for_path("override", dst_path.as_ref()),
+                Some(_) => ask_for_path("overwrite", dst_path.as_ref()),
                 None    => true
             }
         } else {

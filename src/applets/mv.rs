@@ -147,7 +147,7 @@ pub fn main(args: &[String]) -> i32
                         match fs::symlink_metadata(dst_path_buf.as_path()) {
                             Ok(_) => {
                                 answer = if opts.interactive_flag {
-                                    ask_for_path("override", dst_path_buf.as_path())
+                                    ask_for_path("overwrite", dst_path_buf.as_path())
                                 } else {
                                     true
                                 };
