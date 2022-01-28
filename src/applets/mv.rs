@@ -83,7 +83,7 @@ fn mv_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metad
         match remove_file(src_path.as_ref()) {
             Ok(())   => (),
             Err(err) => {
-                eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
+                eprintln!("{}: {}", src_path.as_ref().to_string_lossy(), err);
                 is_success = false;
             },
         }
