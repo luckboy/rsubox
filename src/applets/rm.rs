@@ -121,7 +121,7 @@ pub fn main(args: &[String]) -> i32
     }
     let mut status = 0;
     let paths: Vec<&String> = args.iter().skip(opt_parser.index()).collect();
-    if paths.len() >= 1 {
+    if !paths.is_empty() {
         for path in &paths {
             let (_, name) = dir_name_and_base_name(path.as_str(), None);
             if name != String::from(".") && name != String::from("..") {
