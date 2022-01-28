@@ -79,12 +79,14 @@ fn mv_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metad
     if is_success {
         is_success = preserve(src_metadata, dst_path.as_ref());
     }
-    match remove_file(src_path.as_ref()) {
-        Ok(())   => (),
-        Err(err) => {
-            eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
-            is_success = false;
-        },
+    if is_success {
+        match remove_file(src_path.as_ref()) {
+            Ok(())   => (),
+            Err(err) => {
+                eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
+                is_success = false;
+            },
+        }
     }
     is_success
 }
@@ -92,12 +94,14 @@ fn mv_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metad
 fn preserve_and_remove_dir<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_metadata: &fs::Metadata, dst_path: Q) -> bool
 {
     let mut is_success = preserve(src_metadata, dst_path.as_ref());
-    match remove_dir(src_path.as_ref()) {
-        Ok(())   => (),
-        Err(err) => {
-            eprintln!("{}: {}", src_path.as_ref().to_string_lossy(), err);
-            is_success = false;
-        },
+    if is_success {
+        match remove_dir(src_path.as_ref()) {
+            Ok(())   => (),
+            Err(err) => {
+                eprintln!("{}: {}", src_path.as_ref().to_string_lossy(), err);
+                is_success = false;
+            },
+        }
     }
     is_success
 }
