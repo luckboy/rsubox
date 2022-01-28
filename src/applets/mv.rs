@@ -157,7 +157,7 @@ pub fn main(args: &[String]) -> i32
                 match dst_path_buf {
                     Some(mut dst_path_buf) => {
                         let mut answer = true; 
-                        match fs::symlink_metadata(dst_path_buf.as_path()) {
+                        match fs::metadata(dst_path_buf.as_path()) {
                             Ok(_) => {
                                 let mut is_success = true;
                                 answer = if opts.interactive_flag || (!opts.force_flag && opts.tty_stdin_flag && !access_for_remove(dst_path_buf.as_path(), &mut is_success)) {
