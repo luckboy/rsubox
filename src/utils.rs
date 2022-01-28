@@ -398,7 +398,7 @@ pub fn access_for_remove<P: AsRef<Path>>(path: P, is_success: &mut bool) -> bool
         Err(err)      => {
             eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
             *is_success = false;
-            false
+            true
         },
     }
 }
