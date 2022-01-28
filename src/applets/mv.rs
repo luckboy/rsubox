@@ -25,8 +25,10 @@ use crate::utils::*;
 
 struct Options
 {
+    force_flag: bool,
     interactive_flag: bool,
     no_rename_flag: bool,
+    tty_stdin_flag: bool,
 }
 
 fn utimes_and_chown_and_set_permissions<P: AsRef<Path>>(path: P, times: &Times, uid: uid_t, gid: gid_t, perms: Permissions) -> Result<()>
@@ -108,16 +110,19 @@ fn preserve_and_remove_dir<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, src_meta
 
 pub fn main(args: &[String]) -> i32
 {
-    let mut opt_parser = getopt::Parser::new(args, "fiT");
+    let mut opt_parser = getopt::Parser::new(args, "fiNT");
     let mut opts = Options {
+        force_flag: false,
         interactive_flag: false,
         no_rename_flag: false,
+        tty_stdin_flag: false,
     };
     loop {
         match opt_parser.next() {
-            Some(Ok(Opt('f', _))) => (),
+            Some(Ok(Opt('f', _))) => opts.force_flag = true,
             Some(Ok(Opt('i', _))) => opts.interactive_flag = true,
-            Some(Ok(Opt('T', _))) => opts.no_rename_flag = true,
+            Some(Ok(Opt('N', _))) => opts.no_rename_flag = true,
+            Some(Ok(Opt('T', _))) => opts.tty_stdin_flag = true,
             Some(Ok(Opt(c, _))) => {
                 eprintln!("unknown option -- {:?}", c);
                 return 1;
@@ -128,6 +133,10 @@ pub fn main(args: &[String]) -> i32
             },
             None => break,
         }
+    }
+    match isatty(0) {
+        Ok(true) => opts.tty_stdin_flag = true,
+        _        => (),
     }
     let mut status = 0;
     let mut paths: Vec<&String> = args.iter().skip(opt_parser.index()).collect();
@@ -150,11 +159,16 @@ pub fn main(args: &[String]) -> i32
                         let mut answer = true; 
                         match fs::symlink_metadata(dst_path_buf.as_path()) {
                             Ok(_) => {
-                                answer = if opts.interactive_flag {
+                                let mut is_success = true;
+                                answer = if opts.interactive_flag || (!opts.force_flag && opts.tty_stdin_flag && !access_for_remove(dst_path_buf.as_path(), &mut is_success)) {
                                     ask_for_path("overwrite", dst_path_buf.as_path())
                                 } else {
                                     true
                                 };
+                                if !is_success {
+                                    status = 1;
+                                    continue;
+                                }
                             },
                             Err(err) if err.kind() == ErrorKind::NotFound => (),
                             Err(err) => {
