@@ -206,7 +206,13 @@ pub fn main(args: &[String]) -> i32
                                                 },
                                             }
                                         },
-                                        DoAction::DirActionAfterList => preserve(src_metadata, dst_path_buf_r.as_path()),
+                                        DoAction::DirActionAfterList => {
+                                            if opts.preserve_flag {
+                                                preserve(src_metadata, dst_path_buf_r.as_path())
+                                            } else {
+                                                true
+                                            }
+                                        },
                                     };
                                     match (action, is_success) {
                                         (DoAction::FileAction | DoAction::DirActionAfterList, _) | (_, false) => {
