@@ -33,7 +33,7 @@ struct Options
 
 fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
 {
-    if src_metadata.file_type().is_symlink() {
+    if !src_metadata.file_type().is_symlink() {
         let times = Times {
             atime: TimeValue {
                 sec: src_metadata.atime(),

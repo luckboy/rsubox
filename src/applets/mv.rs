@@ -40,7 +40,7 @@ fn utimes_and_chown_and_set_permissions<P: AsRef<Path>>(path: P, times: &Times, 
 
 fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
 {
-    if src_metadata.file_type().is_symlink() {
+    if !src_metadata.file_type().is_symlink() {
         let times = Times {
             atime: TimeValue {
                 sec: src_metadata.atime(),
