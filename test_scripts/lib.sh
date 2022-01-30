@@ -80,12 +80,14 @@ assert() {
 
 # Usage: assert_non_existent_file <assert name> <file>
 assert_non_existent_file() {
-    assert "$1" [ ! -e "$2" ]
+    [ ! -e "$2" ]
+    assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: assert_existent_file <assert name> <file>
 assert_existent_file() {
-    assert "$1" [ -e "$2" ]
+    [ -e "$2" ]
+    assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: assert_compare_files <assert name> <file1> <file2>
@@ -176,6 +178,6 @@ assert_file_mtime() {
 
 # Usage: assert_file_link <assert name> <link> <file>
 assert_file_link() {
-    _link="`readlink "$3"`"
+    _link="`readlink "$3" 2> /dev/null`"
     assert "$1" [ "$2" = "$_link" ]
 }
