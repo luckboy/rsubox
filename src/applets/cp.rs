@@ -117,9 +117,15 @@ pub fn main(args: &[String]) -> i32
     loop {
         match opt_parser.next() {
             Some(Ok(Opt('f', _))) => (),
-            Some(Ok(Opt('H', _))) => opts.do_flag = DoFlag::NonRecursiveDereference,
+            Some(Ok(Opt('H', _))) => {
+                opts.do_flag = DoFlag::NonRecursiveDereference;
+                is_default_do_flag = false;
+            },                
             Some(Ok(Opt('i', _))) => opts.interactive_flag = true,
-            Some(Ok(Opt('L', _))) => opts.do_flag = DoFlag::RecursiveDereference,
+            Some(Ok(Opt('L', _))) => {
+                opts.do_flag = DoFlag::RecursiveDereference;
+                is_default_do_flag = false;
+            },                
             Some(Ok(Opt('P', _))) => {
                 opts.do_flag = DoFlag::NoDereference;
                 is_default_do_flag = false;
