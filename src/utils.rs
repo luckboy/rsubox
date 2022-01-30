@@ -32,7 +32,7 @@ use std::path::*;
 use std::str::*;
 use libc;
 
-pub use libc::{dev_t, uid_t, gid_t};
+pub use libc::{uid_t, gid_t};
 
 #[derive(Copy, Clone)]
 pub struct TimeValue
@@ -351,7 +351,7 @@ pub fn mkdir_for_copy<P: AsRef<Path>>(path: P, metadata: &fs::Metadata) -> bool
     }
 }
 
-fn remove_file_and_mknod<P: AsRef<Path>>(path: P, mode: u32, dev: dev_t) -> Result<()>
+fn remove_file_and_mknod<P: AsRef<Path>>(path: P, mode: u32, dev: u64) -> Result<()>
 {
     let res = match remove_file(path.as_ref()) {
         Ok(()) => Ok(()),
@@ -418,10 +418,10 @@ pub fn access<P: AsRef<Path>>(path: P, mode: i32) -> Result<bool>
     }
 }
 
-pub fn mknod<P: AsRef<Path>>(path: P, mode: u32, dev: dev_t) -> Result<()>
+pub fn mknod<P: AsRef<Path>>(path: P, mode: u32, dev: u64) -> Result<()>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
-    let res = unsafe { libc::mknod(path_cstring.as_ptr(), mode, dev) };
+    let res = unsafe { libc::mknod(path_cstring.as_ptr(), mode, dev as libc::dev_t) };
     if res != -1 {
         Ok(())
     } else {

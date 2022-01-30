@@ -45,7 +45,7 @@ fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
             },
         };
         let _utimes_res = utimes(dst_path.as_ref(), &times);
-        let _chown_res = chown(dst_path.as_ref(), src_metadata.uid(), src_metadata.gid());
+        let _chown_res = chown(dst_path.as_ref(), src_metadata.uid() as uid_t, src_metadata.gid() as gid_t);
         match set_permissions(dst_path.as_ref(), src_metadata.permissions()) {
             Ok(())   => true,
             Err(err) => {
@@ -54,7 +54,7 @@ fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
             },
         }
     } else {
-        let _lchown_res = lchown(dst_path.as_ref(), src_metadata.uid(), src_metadata.gid());
+        let _lchown_res = lchown(dst_path.as_ref(), src_metadata.uid() as uid_t, src_metadata.gid() as gid_t);
         true
     }
 }

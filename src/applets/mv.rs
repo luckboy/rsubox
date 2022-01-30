@@ -51,7 +51,7 @@ fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
                 usec: src_metadata.mtime_nsec() / 1000,
             },
         };
-        match utimes_and_chown_and_set_permissions(dst_path.as_ref(), &times, src_metadata.uid(), src_metadata.gid(), src_metadata.permissions()) {
+        match utimes_and_chown_and_set_permissions(dst_path.as_ref(), &times, src_metadata.uid() as uid_t, src_metadata.gid() as gid_t, src_metadata.permissions()) {
             Ok(())   => true,
             Err(err) => {
                 eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
@@ -59,7 +59,7 @@ fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
             },
         }
     } else {
-        match lchown(dst_path.as_ref(), src_metadata.uid(), src_metadata.gid()) {
+        match lchown(dst_path.as_ref(), src_metadata.uid() as uid_t, src_metadata.gid() as gid_t) {
             Ok(())   => true,
             Err(err) => {
                 eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
