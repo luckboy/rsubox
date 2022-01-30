@@ -179,5 +179,6 @@ assert_file_mtime() {
 # Usage: assert_file_link <assert name> <link> <file>
 assert_file_link() {
     _link="`readlink "$3" 2> /dev/null`"
-    assert "$1" [ "$2" = "$_link" ]
+    [ "$2" = "$_link" ]
+    assert "$1" [ 0 = "$?" ]
 }
