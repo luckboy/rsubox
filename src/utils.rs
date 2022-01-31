@@ -421,7 +421,7 @@ pub fn access<P: AsRef<Path>>(path: P, mode: i32) -> Result<bool>
 pub fn mknod<P: AsRef<Path>>(path: P, mode: u32, dev: u64) -> Result<()>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
-    let res = unsafe { libc::mknod(path_cstring.as_ptr(), mode, dev as libc::dev_t) };
+    let res = unsafe { libc::mknod(path_cstring.as_ptr(), mode as libc::mode_t, dev as libc::dev_t) };
     if res != -1 {
         Ok(())
     } else {
@@ -473,7 +473,7 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 }
 
 pub fn umask(mask: u32) -> u32 
-{ unsafe { libc::umask(mask) } }
+{ unsafe { libc::umask(mask as libc::mode_t) as u32 } }
 
 pub fn isatty(fd: i32) -> Result<bool>
 {
