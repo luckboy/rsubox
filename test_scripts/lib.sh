@@ -164,14 +164,14 @@ assert_file_size() {
 
 # Usage: assert_file_atime <assert name> <pattern> <file>
 assert_file_atime() {
-    _atime="`ls -ldu "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
+    _atime="`LC_TIME=C ls -ldu "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
     printf '%s\n' "$_atime" | grep "$2" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: <assert name> <pattern> <file>
 assert_file_mtime() {
-    _mtime="`ls -ldc "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
+    _mtime="`LC_TIME=C ls -ld "$3" 2> /dev/null | awk '{ print $6 " " $7 " " $8; }'`"
     printf '%s\n' "$_mtime" | grep "$2" > /dev/null 2> /dev/null
     assert "$1" [ 0 = "$?" ]
 }
