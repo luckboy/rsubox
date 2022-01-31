@@ -90,7 +90,7 @@ start_test wc "wc prints number of bytes for text"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test cat "cat complains on non-existent file"
+start_test wc "wc complains on non-existent file"
     "../$RSUBOX" wc xxx  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 != "$?" ] &&
@@ -98,7 +98,7 @@ start_test cat "cat complains on non-existent file"
     assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
 end_test
 
-start_test cat "cat complains on file that deosn't contain valid UTF-8"
+start_test wc "wc complains on file that deosn't contain valid UTF-8"
     "../$RSUBOX" wc ../test_fixtures/test_invalid_utf8.txt  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 != "$?" ] &&
