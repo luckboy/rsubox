@@ -673,7 +673,7 @@ start_test cp "cp recursively copies fifo file"
     assert_file_mode 6 '^prw-------' yyy
 end_test
 
-start_test cp "cp overwrites symbolic link"
+start_test cp "cp overwrites symbolic link and doesn't overwrite target of symbolic link"
     echo xxx > xxx
     ln -s passwd yyy
     echo passwd > passwd
@@ -685,7 +685,10 @@ start_test cp "cp overwrites symbolic link"
     assert_existent_file 4 xxx &&
     assert_existent_file 5 yyy &&
     assert_file_mode 6 '^-' yyy &&
-    assert_file_content 7 xxx yyy
+    assert_file_content 7 xxx yyy &&
+    assert_existent_file 8 passwd &&
+    assert_file_mode 9 '^-' passwd &&
+    assert_file_content 9 passwd passwd
 end_test
 
 start_test cp "cp complains on too few arguments for zero arguments"
