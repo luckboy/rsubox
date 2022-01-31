@@ -25,6 +25,7 @@ fi
 start_test_suites
 . ./test_scripts/basename_tests.sh
 . ./test_scripts/cat_tests.sh
+. ./test_scripts/cp_tests.sh
 . ./test_scripts/dirname_tests.sh
 . ./test_scripts/echo_tests.sh
 . ./test_scripts/false_tests.sh
