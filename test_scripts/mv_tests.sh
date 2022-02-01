@@ -300,7 +300,7 @@ start_test mv "mv moves directory"
     assert_file_content 12 yyy dst/yyy
 end_test
 
-start_test mv "mv doesn't follow link during moving"
+start_test mv "mv doesn't follow links during moving"
     mkdir src
     echo xxx > src/xxx
     ln -s zzz src/yyy

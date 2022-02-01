@@ -37,7 +37,7 @@ start_test rm "rm removes two files"
     assert_non_existent_file 4 yyy
 end_test
 
-start_test rm "rm doesn't follow link during removing"
+start_test rm "rm doesn't follow links during removing"
     ln -s zzz xxx
     echo yyy > yyy
     echo zzz > zzz
