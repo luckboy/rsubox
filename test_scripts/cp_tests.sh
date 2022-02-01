@@ -605,7 +605,7 @@ start_test cp "cp copies file for interactive option"
     assert_file_content 6 xxx yyy
 end_test
 
-start_test cp "cp ask for overwrite file and overwrites file for interactive option"
+start_test cp "cp asks for overwrite file and overwrites file for interactive option"
     echo xxx > xxx
     echo yyy > yyy
     echo -n "overwrite yyy? " > ../test_tmp/expected.txt
@@ -620,7 +620,7 @@ start_test cp "cp ask for overwrite file and overwrites file for interactive opt
     assert_file_content 7 xxx yyy
 end_test
 
-start_test cp "cp ask for overwrite file and doesn't overwrite file for interactive option"
+start_test cp "cp asks for overwrite file and doesn't overwrite file for interactive option"
     echo xxx > xxx
     echo yyy > yyy
     echo -n "overwrite yyy? " > ../test_tmp/expected.txt
