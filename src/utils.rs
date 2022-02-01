@@ -443,7 +443,7 @@ pub fn chown<P: AsRef<Path>>(path: P, uid: uid_t, gid: gid_t) -> Result<()>
 pub fn lchown<P: AsRef<Path>>(path: P, uid: uid_t, gid: gid_t) -> Result<()>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
-    let res = unsafe { libc::chown(path_cstring.as_ptr(), uid, gid) };
+    let res = unsafe { libc::lchown(path_cstring.as_ptr(), uid, gid) };
     if res != -1 {
         Ok(())
     } else {
