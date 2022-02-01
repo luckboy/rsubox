@@ -201,6 +201,23 @@ start_test rm "rm asks for descend into directory and doesn't descend into direc
     assert_existent_file 4 tst
 end_test
 
+start_test rm "rm asks for descend into directory and doesn't descend into directory and doesn't remove two files for tty stdin and read only directory"
+    mkdir tst
+    echo xxx > tst/xxx
+    echo yyy > tst/yyy
+    chmod 555 tst
+    echo -n "descend into tst? " > ../test_tmp/expected.txt
+    echo n | "../$RSUBOX" rm -RT tst > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_compare_files 3 ../test_tmp/expected.txt ../test_tmp/stderr.txt &&
+    assert_existent_file 4 tst &&
+    assert_existent_file 5 tst/xxx &&
+    assert_existent_file 6 tst/yyy
+    chmod 755 tst
+end_test
+
 start_test rm "rm doesn't ask for remove file and removes file for force option, tty stdin and read only file"
     echo xxx > xxx
     chmod 444 xxx
@@ -265,6 +282,34 @@ start_test rm "rm asks for descend into directory and remove directory and desce
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_compare_files 3 ../test_tmp/expected.txt ../test_tmp/stderr.txt &&
     assert_existent_file 4 tst
+end_test
+
+start_test rm "rm asks for descend into directory, remove two files and remove directory and descends into directory, removes two files and removes directory for interactive option"
+    mkdir tst
+    echo xxx > tst/xxx
+    echo yyy > tst/yyy
+    echo -n "descend into tst? remove tst/xxx? remove tst/yyy? remove tst? " > ../test_tmp/expected.txt
+    (echo y; echo y; echo y; echo y) | "../$RSUBOX" rm -iR tst > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_compare_files 3 ../test_tmp/expected.txt ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 tst
+end_test
+
+start_test rm "rm asks for descend into directory, remove two files and remove directory and descends into directory, doesn't remove two files and doesn't remove directory for interactive option"
+    mkdir tst
+    echo xxx > tst/xxx
+    echo yyy > tst/yyy
+    echo -n "descend into tst? remove tst/xxx? remove tst/yyy? remove tst? " > ../test_tmp/expected.txt
+    (echo y; echo n; echo n; echo n) | "../$RSUBOX" rm -iR tst > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_compare_files 3 ../test_tmp/expected.txt ../test_tmp/stderr.txt &&
+    assert_existent_file 4 tst &&
+    assert_existent_file 5 tst/xxx &&
+    assert_existent_file 6 tst/yyy
 end_test
 
 start_test rm "rm asks for descend into directory and remove directory and doesn't descend into directory for interactive option"
