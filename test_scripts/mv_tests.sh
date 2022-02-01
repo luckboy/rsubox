@@ -230,7 +230,7 @@ start_test mv "mv asks for overwrite file and doesn't overwrite file for interac
     assert_file_content 7 yyy yyy
 end_test
 
-start_test mv "mv moves file"
+start_test mv "mv moves small file"
     echo xxx > xxx
     echo -n | "../$RSUBOX" mv -N xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
@@ -241,6 +241,19 @@ start_test mv "mv moves file"
     assert_existent_file 5 yyy &&
     assert_file_mode 6 '^-' yyy &&
     assert_file_content 7 xxx yyy
+end_test
+
+start_test mv "mv moves big file"
+    cp ../test_fixtures/test.txt xxx
+    echo -n | "../$RSUBOX" mv -N xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 xxx &&
+    assert_existent_file 5 yyy &&
+    assert_file_mode 6 '^-' yyy &&
+    assert_compare_files 7 ../test_fixtures/test.txt yyy
 end_test
 
 start_test mv "mv moves one file to directory"
