@@ -396,6 +396,18 @@ start_test mv "mv preserves directory status"
     assert_file_mtime 10 2002 dst
 end_test
 
+start_test mv "mv moves fifo file"
+    mkfifo xxx
+    echo -n | "../$RSUBOX" mv -N xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 xxx &&
+    assert_existent_file 5 yyy &&
+    assert_file_mode 6 '^prw-' yyy
+end_test
+
 start_test mv "mv overwrites symbolic link and doesn't overwrite target of symbolic link"
     echo xxx > xxx
     ln -s passwd yyy
