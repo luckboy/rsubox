@@ -29,6 +29,8 @@ start_test_suites
 . ./test_scripts/dirname_tests.sh
 . ./test_scripts/echo_tests.sh
 . ./test_scripts/false_tests.sh
+. ./test_scripts/mv_tests.sh
+. ./test_scripts/rm_tests.sh
 . ./test_scripts/true_tests.sh
 . ./test_scripts/wc_tests.sh
 end_test_suites
