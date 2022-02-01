@@ -762,7 +762,7 @@ start_test cp "cp complains on source that is non-existent file"
 
     assert 1 [ 0 != "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
-    assert_file_content_pattern 3 'xxx: ' ../test_tmp/stderr.txt
+    assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
     assert_non_existent_file 4 xxx &&
     assert_existent_file 5 yyy &&
     assert_existent_file 6 dst &&
