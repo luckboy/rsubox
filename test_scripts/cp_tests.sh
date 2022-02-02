@@ -772,3 +772,21 @@ start_test cp "cp complains on source that is non-existent file"
     assert_file_mode 10 '^-' dst/yyy &&
     assert_file_content 11 yyy dst/yyy
 end_test
+
+start_test cp "cp complains on source that is non-existent file for recursive option"
+    echo yyy > yyy
+    mkdir dst
+    "../$RSUBOX" cp -R xxx yyy dst> ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 xxx &&
+    assert_existent_file 5 yyy &&
+    assert_existent_file 6 dst &&
+    assert_file_mode 7 '^d' dst &&
+    assert_non_existent_file 8 dst/xxx &&
+    assert_existent_file 9 dst/yyy &&
+    assert_file_mode 10 '^-' dst/yyy &&
+    assert_file_content 11 yyy dst/yyy
+end_test

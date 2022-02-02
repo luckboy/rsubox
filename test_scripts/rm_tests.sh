@@ -135,6 +135,14 @@ start_test rm "rm doesn't complain non-existent file for force option"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test rm "rm doesn't complain non-existent file for force option and recursive option"
+    "../$RSUBOX" rm -fR xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test rm "rm doesn't complain too few arguments for force option"
     "../$RSUBOX" rm -f > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
@@ -346,6 +354,16 @@ end_test
 start_test rm "rm complains on non-existent file"
     echo yyy > yyy
     echo -n | "../$RSUBOX" rm xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 yyy
+end_test
+
+start_test rm "rm complains on non-existent file for recursive option"
+    echo yyy > yyy
+    echo -n | "../$RSUBOX" rm -R xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 != "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
