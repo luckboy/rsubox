@@ -691,6 +691,41 @@ start_test cp "cp overwrites symbolic link and doesn't overwrite target of symbo
     assert_file_content 9 passwd passwd
 end_test
 
+start_test cp "cp overwrites symbolic link and doesn't overwrite target of symbolic link for directory"
+    mkdir src
+    mkdir src/test
+    echo xxx > src/test/passwd
+    mkdir dst
+    mkdir dst/src
+    ln -s ../../etc dst/src/test
+    mkdir etc
+    echo passwd > etc/passwd
+    "../$RSUBOX" cp -R src dst > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 src &&
+    assert_existent_file 5 src/test &&
+    assert_existent_file 6 src/test/passwd &&
+    assert_existent_file 7 dst &&
+    assert_file_mode 8 '^d' dst &&
+    assert_existent_file 9 dst/src &&
+    assert_file_mode 10 '^drwx' dst &&
+    assert_existent_file 11 dst/src &&
+    assert_file_mode 12 '^drwx' dst/src &&
+    assert_existent_file 13 dst/src/test &&
+    assert_file_mode 14 '^drwx' dst/src/test &&
+    assert_existent_file 15 dst/src/test/passwd &&
+    assert_file_mode 16 '^-' dst/src/test/passwd &&
+    assert_file_content 17 xxx dst/src/test/passwd &&
+    assert_existent_file 18 etc &&
+    assert_file_mode 19 '^d' etc &&
+    assert_existent_file 20 etc/passwd &&
+    assert_file_mode 21 '^-' etc/passwd &&
+    assert_file_content 22 passwd etc/passwd
+end_test
+
 start_test cp "cp complains on too few arguments for zero arguments"
     "../$RSUBOX" cp > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 

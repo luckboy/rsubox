@@ -426,6 +426,39 @@ start_test mv "mv overwrites symbolic link and doesn't overwrite target of symbo
     assert_file_content 9 passwd passwd
 end_test
 
+start_test mv "mv overwrites symbolic link and doesn't overwrite target of symbolic link for directory"
+    mkdir src
+    mkdir src/test
+    echo xxx > src/test/passwd
+    mkdir dst
+    mkdir dst/src
+    ln -s ../../etc dst/src/test
+    mkdir etc
+    echo passwd > etc/passwd
+    echo -n | "../$RSUBOX" mv -N src dst > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_non_existent_file 4 src &&
+    assert_existent_file 5 dst &&
+    assert_file_mode 6 '^d' dst &&
+    assert_existent_file 7 dst/src &&
+    assert_file_mode 8 '^drwx' dst &&
+    assert_existent_file 9 dst/src &&
+    assert_file_mode 10 '^drwx' dst/src &&
+    assert_existent_file 11 dst/src/test &&
+    assert_file_mode 12 '^drwx' dst/src/test &&
+    assert_existent_file 13 dst/src/test/passwd &&
+    assert_file_mode 14 '^-' dst/src/test/passwd &&
+    assert_file_content 15 xxx dst/src/test/passwd &&
+    assert_existent_file 16 etc &&
+    assert_file_mode 17 '^d' etc &&
+    assert_existent_file 18 etc/passwd &&
+    assert_file_mode 19 '^-' etc/passwd &&
+    assert_file_content 20 passwd etc/passwd
+end_test
+
 start_test mv "mv complains on too few arguments for zero arguments"
     echo -n | "../$RSUBOX" mv > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
