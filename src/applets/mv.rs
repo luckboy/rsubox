@@ -211,7 +211,7 @@ pub fn main(args: &[String]) -> i32
                                                 Some(name) => dst_path_buf_r.push(name),
                                                 None       => (),
                                             }
-                                            dst_metadata_stack_r.push(fs::metadata(dst_path_buf_r.as_path()));
+                                            dst_metadata_stack_r.push(fs::symlink_metadata(dst_path_buf_r.as_path()));
                                         },
                                         _ => (),
                                     };
@@ -220,8 +220,18 @@ pub fn main(args: &[String]) -> i32
                                             match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                                 Ok(dst_metadata) => {
                                                     if !dst_metadata.file_type().is_dir() {
-                                                        eprintln!("{}: Not a directory", dst_path_buf_r.as_path().to_string_lossy());
-                                                        false
+                                                        if !dst_metadata.file_type().is_symlink() {
+                                                            eprintln!("{}: Not a directory", dst_path_buf_r.as_path().to_string_lossy());
+                                                            false
+                                                        } else {
+                                                            match remove_file(dst_path_buf_r.as_path()) {
+                                                                Ok(())   => mkdir_for_copy(dst_path_buf_r.as_path(), src_metadata),
+                                                                Err(err) => {
+                                                                    eprintln!("{}: {}", dst_path_buf_r.as_path().to_string_lossy(), err);
+                                                                    false
+                                                                }
+                                                            }
+                                                        }
                                                     } else {
                                                         true
                                                     }
