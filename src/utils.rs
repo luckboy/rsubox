@@ -19,8 +19,10 @@ use std::char;
 use std::io::*;
 use std::iter::Iterator;
 use std::ffi::*;
+use std::fmt;
 use std::fs;
 use std::fs::*;
+use std::mem::MaybeUninit;
 use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::DirBuilderExt;
 use std::os::unix::fs::FileTypeExt;
@@ -29,6 +31,8 @@ use std::os::unix::fs::PermissionsExt;
 use std::os::unix::fs::symlink;
 use std::path;
 use std::path::*;
+use std::ptr::null_mut;
+use std::result;
 use std::str::*;
 use libc;
 
@@ -168,6 +172,89 @@ impl<R: BufRead> BufRead for CharByteReader<R>
 
 impl<R: BufRead> CharByteRead for CharByteReader<R>
 {}
+
+pub struct Regex
+{ libc_regex: libc::regex_t, }
+
+impl Regex
+{
+    pub fn new(pattern: &OsStr, flags: i32) -> RegexResult
+    {
+        let mut regex: Regex = unsafe { MaybeUninit::uninit().assume_init() };
+        let pattern_cstring = CString::new(pattern.as_bytes()).unwrap();
+        let libc_regex_err = unsafe { libc::regcomp(&mut regex.libc_regex as *mut libc::regex_t, pattern_cstring.as_ptr(), flags) };
+        if libc_regex_err == 0 {
+            Ok(regex)
+        } else {
+            let mut err_buf: Vec<u8> = vec![0; 256];
+            unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, err_buf.as_mut_ptr() as *mut i8, 256); };
+            Err(RegexError {
+                    libc_regex_error: libc_regex_err,
+                    message: CStr::from_bytes_with_nul(err_buf.as_slice()).unwrap().to_string_lossy().into_owned(),
+            })
+        }
+    }
+    
+    pub fn is_match(&self, s: &OsStr, count_and_matches: Option<(usize, &mut Vec<RegexMatch>)>, flags: i32) -> bool
+    {
+        let s_cstring = CString::new(s.as_bytes()).unwrap();
+        match count_and_matches {
+            Some((count, matches)) => {
+                let mut match_buf: Vec<libc::regmatch_t> = vec![libc::regmatch_t {
+                    rm_so: -1 as libc::regoff_t,
+                    rm_eo: -1 as libc::regoff_t,
+                }; count];
+                let libc_regex_err = unsafe { libc::regexec(&self.libc_regex as *const libc::regex_t, s_cstring.as_ptr(), count, match_buf.as_mut_ptr(), flags) };
+                if libc_regex_err == 0 {
+                    for m in &match_buf {
+                        if m.rm_so == -1 && m.rm_eo == -1 { break; }
+                        matches.push(RegexMatch { start: m.rm_so as usize, end: m.rm_eo as usize, });
+                    }
+                    true
+                } else {
+                    false
+                }
+            },
+            None => {
+                let libc_regex_err = unsafe { libc::regexec(&self.libc_regex as *const libc::regex_t, s_cstring.as_ptr(), 0, null_mut(), flags) };
+                libc_regex_err == 0
+            },
+        }
+    }
+}
+
+impl Drop for Regex
+{
+    fn drop(&mut self)
+    { unsafe { libc::regfree(&mut self.libc_regex as *mut libc::regex_t); }; }
+}
+
+pub struct RegexMatch
+{
+    pub start: usize,
+    pub end: usize,
+}
+
+pub type RegexResult = result::Result<Regex, RegexError>;
+
+#[derive(Debug)]
+pub struct RegexError
+{
+    libc_regex_error: i32,
+    message: String,
+}
+
+impl RegexError
+{
+    pub fn regex_error(&self) -> i32
+    { self.libc_regex_error }
+}
+
+impl fmt::Display for RegexError
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result
+    { write!(f, "{}", self.message) }
+}
 
 pub fn escape(chars: &mut PushbackIter<Chars>) -> String
 {

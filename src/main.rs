@@ -22,6 +22,7 @@ use std::path::*;
 use std::process::*;
 
 mod applets;
+#[allow(dead_code)]
 mod utils;
 
 use applets::initialize_applet_funs;
