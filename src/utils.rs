@@ -178,10 +178,10 @@ pub struct Regex
 
 impl Regex
 {
-    pub fn new(pattern: &OsStr, flags: i32) -> RegexResult
+    pub fn new<S: AsRef<OsStr>>(pattern: S, flags: i32) -> RegexResult
     {
         let mut regex: Regex = unsafe { MaybeUninit::uninit().assume_init() };
-        let pattern_cstring = CString::new(pattern.as_bytes()).unwrap();
+        let pattern_cstring = CString::new(pattern.as_ref().as_bytes()).unwrap();
         let libc_regex_err = unsafe { libc::regcomp(&mut regex.libc_regex as *mut libc::regex_t, pattern_cstring.as_ptr(), flags) };
         if libc_regex_err == 0 {
             Ok(regex)
@@ -195,9 +195,9 @@ impl Regex
         }
     }
     
-    pub fn is_match(&self, s: &OsStr, count_and_matches: Option<(usize, &mut Vec<RegexMatch>)>, flags: i32) -> bool
+    pub fn is_match<S: AsRef<OsStr>>(&self, s: S, count_and_matches: Option<(usize, &mut Vec<RegexMatch>)>, flags: i32) -> bool
     {
-        let s_cstring = CString::new(s.as_bytes()).unwrap();
+        let s_cstring = CString::new(s.as_ref().as_bytes()).unwrap();
         match count_and_matches {
             Some((count, matches)) => {
                 let mut match_buf: Vec<libc::regmatch_t> = vec![libc::regmatch_t {
