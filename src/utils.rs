@@ -52,7 +52,7 @@ pub struct Times
     pub mtime: TimeValue,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum DoFlag
 {
     NoDereference,
@@ -60,7 +60,7 @@ pub enum DoFlag
     RecursiveDereference,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum  DoAction
 {
     DirActionBeforeList,
@@ -73,6 +73,7 @@ pub trait PushbackIterator: Iterator
     fn undo(&mut self, item: Self::Item);
 }
 
+#[derive(Clone)]
 pub struct PushbackIter<I: Iterator>
 {
     iter: I,
@@ -229,6 +230,7 @@ impl Drop for Regex
     { unsafe { libc::regfree(&mut self.libc_regex as *mut libc::regex_t); }; }
 }
 
+#[derive(Copy, Clone)]
 pub struct RegexMatch
 {
     pub start: usize,
@@ -237,7 +239,7 @@ pub struct RegexMatch
 
 pub type RegexResult = result::Result<Regex, RegexError>;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct RegexError
 {
     libc_regex_error: i32,
