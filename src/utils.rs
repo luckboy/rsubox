@@ -175,7 +175,9 @@ impl<R: BufRead> CharByteRead for CharByteReader<R>
 {}
 
 pub struct Regex
-{ libc_regex: libc::regex_t, }
+{
+    libc_regex: libc::regex_t,
+}
 
 impl Regex
 {
