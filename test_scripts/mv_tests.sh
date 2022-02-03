@@ -444,11 +444,11 @@ start_test mv "mv overwrites symbolic link and doesn't overwrite target of symbo
     assert_existent_file 5 dst &&
     assert_file_mode 6 '^d' dst &&
     assert_existent_file 7 dst/src &&
-    assert_file_mode 8 '^drwx' dst &&
+    assert_file_mode 8 '^d' dst &&
     assert_existent_file 9 dst/src &&
-    assert_file_mode 10 '^drwx' dst/src &&
+    assert_file_mode 10 '^d' dst/src &&
     assert_existent_file 11 dst/src/test &&
-    assert_file_mode 12 '^drwx' dst/src/test &&
+    assert_file_mode 12 '^d' dst/src/test &&
     assert_existent_file 13 dst/src/test/passwd &&
     assert_file_mode 14 '^-' dst/src/test/passwd &&
     assert_file_content 15 xxx dst/src/test/passwd &&
