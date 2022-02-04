@@ -191,9 +191,14 @@ impl Regex
         } else {
             let mut err_buf: Vec<u8> = vec![0; 256];
             unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, err_buf.as_mut_ptr() as *mut i8, 256); };
+            let mut len = 0;
+            for c in &err_buf {
+                if *c == 0 { break; }
+                len += 1;
+            }
             Err(RegexError {
                     libc_regex_error: libc_regex_err,
-                    message: CStr::from_bytes_with_nul(err_buf.as_slice()).unwrap().to_string_lossy().into_owned(),
+                    message: CStr::from_bytes_with_nul(&err_buf[0..(len + 1)]).unwrap().to_string_lossy().into_owned(),
             })
         }
     }
