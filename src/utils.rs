@@ -189,20 +189,12 @@ impl Regex
         if libc_regex_err == 0 {
             Ok(regex)
         } else {
-            let mut err_buf: Vec<u8> = vec![0; 256];
-            unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, err_buf.as_mut_ptr() as *mut i8, 256); };
-            let mut len = 0;
-            for c in &err_buf {
-                if *c == 0 { break; }
-                len += 1;
-            }
-            if len >= 256 {
-                err_buf[255] = 0;
-                len = 255;
-            }
+            let size = unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, null_mut(), 0) };
+            let mut err_buf: Vec<u8> = vec![0; size];
+            unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, err_buf.as_mut_ptr() as *mut i8, size); };
             Err(RegexError {
                     libc_regex_error: libc_regex_err,
-                    message: CStr::from_bytes_with_nul(&err_buf[0..(len + 1)]).unwrap().to_string_lossy().into_owned(),
+                    message: CStr::from_bytes_with_nul(err_buf.as_slice()).unwrap().to_string_lossy().into_owned(),
             })
         }
     }
