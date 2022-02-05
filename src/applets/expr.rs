@@ -92,11 +92,11 @@ fn parse_and_evaluate6(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                                 Some(m) => {
                                     if m.start == 0 {
                                         match matches.get(1) {
-                                            Some(m2) => {
+                                            Some(m2) if m.start <= m2.start && m.end >= m2.end => {
                                                 let s = OsStr::from_bytes(&arg_s1.as_bytes()[0..m2.end]).to_string_lossy().into_owned();
                                                 get_value_from_string(&s)
                                             },
-                                            None     => Value::Integer(m.end as i64),
+                                            Some(_) | None => Value::Integer(m.end as i64),
                                         }
                                     } else {
                                         Value::Integer(0)
