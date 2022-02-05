@@ -196,6 +196,10 @@ impl Regex
                 if *c == 0 { break; }
                 len += 1;
             }
+            if len >= 256 {
+                err_buf[255] = 0;
+                len = 255;
+            }
             Err(RegexError {
                     libc_regex_error: libc_regex_err,
                     message: CStr::from_bytes_with_nul(&err_buf[0..(len + 1)]).unwrap().to_string_lossy().into_owned(),
