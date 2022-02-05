@@ -70,7 +70,7 @@ assert() {
         cat ../test_tmp/stderr.txt
         echo
         echo -n > ../test_counts/failed.txt
-        if [ "$TEST_ABORT" != "" ]; then
+        if [ x"$TEST_ABORT" != x"" ]; then
             echo
             exit 1
         fi
@@ -121,7 +121,7 @@ read_file_line() {
 # Usage: assert_file_line <assert name> <number of line> <line> <file>
 assert_file_line() {
     _line="`read_file_line "$4" "$2"`"
-    [ "$3" = "$_line" ]
+    [ x"$3" = x"$_line" ]
     assert "$1" [ 0 = "$?" ]
 }
 
@@ -147,13 +147,15 @@ assert_file_nlink() {
 # Usage: assert_file_owner <assert name> <owner> <file>
 assert_file_owner() {
     _owner="`ls -ld "$3" 2> /dev/null | awk '{ print $3; }'`"
-    assert "$1" [ "$2" = "$_owner" ]
+    [ x"$2" = x"$_owner" ]
+    assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: assert_file_group <assert name> <group> <file>
 assert_file_group() {
     _group="`ls -ld "$3" 2> /dev/null | awk '{ print $4; }'`"
-    assert "$1" [ "$2" = "$_group" ]
+    [ x"$2" = x"$_group" ]
+    assert "$1" [ 0 = "$?" ]
 }
 
 # Usage: assert_file_size <assert name> <size> <file>
@@ -179,6 +181,6 @@ assert_file_mtime() {
 # Usage: assert_file_link <assert name> <link> <file>
 assert_file_link() {
     _link="`readlink "$3" 2> /dev/null`"
-    [ "$2" = "$_link" ]
+    [ x"$2" = x"$_link" ]
     assert "$1" [ 0 = "$?" ]
 }
