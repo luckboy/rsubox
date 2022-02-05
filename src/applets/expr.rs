@@ -250,7 +250,8 @@ fn parse_and_evaluate3(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x == y { 1 } else { 0 }),
                     (Value::String(s), Value::String(t)) => res = Value::Integer(if s == t { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) == s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s == &format!("{}", x) { 1 } else { 0 }),
                 }
             },
             Some(("!=", _)) => {
@@ -258,35 +259,44 @@ fn parse_and_evaluate3(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x != y { 1 } else { 0 }),
                     (Value::String(s), Value::String(t)) => res = Value::Integer(if s != t { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) != s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s != &format!("{}", x) { 1 } else { 0 }),
                 }
             },
             Some(("<", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x < y { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
-                }
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s < t { 1 } else { 0 }),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) < s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s < &format!("{}", x) { 1 } else { 0 }),
+                 }
             },
             Some((">=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x >= y { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s >= t { 1 } else { 0 }),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) >= s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s >= &format!("{}", x) { 1 } else { 0 }),
                 }
             },
             Some((">", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x > y { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s > t { 1 } else { 0 }),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) > s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s > &format!("{}", x) { 1 } else { 0 }),
                 }
             },
             Some(("<=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x <= y { 1 } else { 0 }),
-                    (_, _) => res = Value::Integer(0),
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s <= t { 1 } else { 0 }),
+                    (Value::Integer(x), Value::String(s)) => res = Value::Integer(if &format!("{}", x) <= s { 1 } else { 0 }),
+                    (Value::String(s), Value::Integer(x)) => res = Value::Integer(if s <= &format!("{}", x) { 1 } else { 0 }),
                 }
             },
             Some((")", s)) => {
