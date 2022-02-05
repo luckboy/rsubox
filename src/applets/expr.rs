@@ -243,7 +243,7 @@ fn parse_and_evaluate3(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x == y { 1 } else { 0 }),
-                    (Value::String(x), Value::String(y)) => res = Value::Integer(if x == y { 1 } else { 0 }),
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s == t { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
             },
@@ -251,7 +251,7 @@ fn parse_and_evaluate3(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
                 match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x != y { 1 } else { 0 }),
-                    (Value::String(x), Value::String(y)) => res = Value::Integer(if x != y { 1 } else { 0 }),
+                    (Value::String(s), Value::String(t)) => res = Value::Integer(if s != t { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
             },
