@@ -35,6 +35,18 @@ fn get_string_from_value(value: &Value) -> String
     }
 }
 
+fn get_value_from_string(s: &String) -> Value
+{
+    if !s.starts_with('+') {
+        match s.parse::<i64>() {
+            Ok(x)  => Value::Integer(x),
+            Err(_) => Value::String(s.clone()),
+        }
+    } else {
+        Value::String(s.clone())
+    }
+}
+
 fn next_arg<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>) -> Option<(&'a str, &'a String)>
 { arg_iter.next().map(|s| (s.as_str(), s)) }
 
@@ -55,16 +67,7 @@ fn parse_and_evaluate7(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>) -> O
                 },
             }
         },
-        Some((_, s)) => {
-            if !s.starts_with('+') {
-                match s.parse::<i64>() {
-                    Ok(x)  => Some(Value::Integer(x)),
-                    Err(_) => Some(Value::String(s.clone())),
-                }
-            } else {
-                Some(Value::String(s.clone()))
-            }
-        },
+        Some((_, s)) => Some(get_value_from_string(s)),
         None => {
             eprintln!("No argument");
             None
@@ -89,8 +92,11 @@ fn parse_and_evaluate6(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_p
                                 Some(m) => {
                                     if m.start == 0 {
                                         match matches.get(1) {
-                                            Some(m2) => Value::String(OsStr::from_bytes(&arg_s1.as_bytes()[0..m2.end]).to_string_lossy().into_owned()),
-                                            None     => Value::Integer(m.end as i64)
+                                            Some(m2) => {
+                                                let s = OsStr::from_bytes(&arg_s1.as_bytes()[0..m2.end]).to_string_lossy().into_owned();
+                                                get_value_from_string(&s)
+                                            },
+                                            None     => Value::Integer(m.end as i64),
                                         }
                                     } else {
                                         Value::Integer(0)
