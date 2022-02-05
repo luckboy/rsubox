@@ -16,28 +16,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 use std::iter::*;
+use std::ffi::*;
+use std::os::unix::ffi::OsStrExt;
 use std::slice::*;
 use crate::utils::*;
 
-#[derive(Copy, Clone)]
-enum Value<'a>
+enum Value
 {
     Integer(i64),
-    String(&'a str),
+    String(String),
 }
 
-fn get_string_from_value(value: Value<'_>) -> String
+fn get_string_from_value(value: &Value) -> String
 {
     match value {
-        Value::Integer(x) => format!("{}", x),
-        Value::String(s)  => String::from(s),
+        Value::Integer(x) => format!("{}", *x),
+        Value::String(s)  => s.clone(),
     }
 }
 
 fn next_arg<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>) -> Option<(&'a str, &'a String)>
 { arg_iter.next().map(|s| (s.as_str(), s)) }
 
-fn parse_and_evaluate7<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>) -> Option<Value<'a>>
+fn parse_and_evaluate7(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>) -> Option<Value>
 {
     match next_arg(arg_iter) {
         Some(("(", _)) => { 
@@ -54,14 +55,14 @@ fn parse_and_evaluate7<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>) 
                 },
             }
         },
-        Some((s, _)) => {
+        Some((_, s)) => {
             if !s.starts_with('+') {
                 match s.parse::<i64>() {
                     Ok(x)  => Some(Value::Integer(x)),
-                    Err(_) => Some(Value::String(s)),
+                    Err(_) => Some(Value::String(s.clone())),
                 }
             } else {
-                Some(Value::String(s))
+                Some(Value::String(s.clone()))
             }
         },
         None => {
@@ -71,27 +72,35 @@ fn parse_and_evaluate7<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>) 
     }
 }
 
-fn parse_and_evaluate6<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate6(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate7(arg_iter)?;
     loop {
         match next_arg(arg_iter) {
             Some((":", _)) => {
                 let arg2 = parse_and_evaluate7(arg_iter)?;
-                let arg_s1 = get_string_from_value(res);
-                let arg_s2 = get_string_from_value(arg2);
+                let arg_s1 = get_string_from_value(&res);
+                let arg_s2 = get_string_from_value(&arg2);
                 match Regex::new(arg_s2, 0) {
                     Ok(regex) => {
                         let mut matches: Vec<RegexMatch> = Vec::new();
-                        let match_res = if regex.is_match(arg_s1, Some((2, &mut matches)), 0) {
+                        res = if regex.is_match(&arg_s1, Some((2, &mut matches)), 0) {
                             match matches.get(0) {
-                                Some(m) => m.start == 0,
-                                None    => false,
+                                Some(m) => {
+                                    if m.start == 0 {
+                                        match matches.get(1) {
+                                            Some(m2) => Value::String(OsStr::from_bytes(&arg_s1.as_bytes()[0..m2.end]).to_string_lossy().into_owned()),
+                                            None     => Value::Integer(m.end as i64)
+                                        }
+                                    } else {
+                                        Value::Integer(0)
+                                    }
+                                },
+                                None    => Value::Integer(0),
                             }
                         } else {
-                            false
+                            Value::Integer(0)
                         };
-                        res = Value::Integer(if match_res { 1 } else { 0 });
                     },
                     Err(err) => {
                         eprintln!("{}", err);
@@ -117,16 +126,16 @@ fn parse_and_evaluate6<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
     }
 }
 
-fn parse_and_evaluate5<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate5(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate6(arg_iter, in_paren)?;
     loop {
         match next_arg(arg_iter) {
             Some(("*", _)) => {
                 let arg2 = parse_and_evaluate6(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => {
-                        match x.checked_mul(y) {
+                        match x.checked_mul(*y) {
                             Some(z) => res = Value::Integer(z),
                             None    => { eprintln!("Overflow"); break None },
                         }
@@ -136,10 +145,10 @@ fn parse_and_evaluate5<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
             },
             Some(("/", _)) => {
                 let arg2 = parse_and_evaluate6(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(_), Value::Integer(0)) => { eprintln!("Division by zero"); break None },
                     (Value::Integer(x), Value::Integer(y)) => {
-                        match x.checked_div(y) {
+                        match x.checked_div(*y) {
                             Some(z) => res = Value::Integer(z),
                             None    => { eprintln!("Overflow"); break None },
                         }
@@ -149,10 +158,10 @@ fn parse_and_evaluate5<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
             },
             Some(("%", _)) => {
                 let arg2 = parse_and_evaluate6(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(_), Value::Integer(0)) => { eprintln!("Division by zero"); break None },
                     (Value::Integer(x), Value::Integer(y)) => {
-                        match x.checked_rem(y) {
+                        match x.checked_rem(*y) {
                             Some(z) => res = Value::Integer(z),
                             None    => { eprintln!("Overflow"); break None },
                         }
@@ -178,16 +187,16 @@ fn parse_and_evaluate5<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
     }
 }
 
-fn parse_and_evaluate4<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate4(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate5(arg_iter, in_paren)?;
     loop {
         match next_arg(arg_iter) {
             Some(("+", _)) => {
                 let arg2 = parse_and_evaluate5(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => {
-                        match x.checked_add(y) {
+                        match x.checked_add(*y) {
                             Some(z) => res = Value::Integer(z),
                             None    => { eprintln!("Overflow"); break None },
                         }
@@ -197,9 +206,9 @@ fn parse_and_evaluate4<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
             },
             Some(("-", _)) => {
                 let arg2 = parse_and_evaluate5(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => {
-                        match x.checked_sub(y) {
+                        match x.checked_sub(*y) {
                             Some(z) => res = Value::Integer(z),
                             None    => { eprintln!("Overflow"); break None },
                         }
@@ -225,14 +234,14 @@ fn parse_and_evaluate4<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
     }
 }
 
-fn parse_and_evaluate3<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate3(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate4(arg_iter, in_paren)?;
     loop {
         match next_arg(arg_iter) {
             Some(("=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x == y { 1 } else { 0 }),
                     (Value::String(x), Value::String(y)) => res = Value::Integer(if x == y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
@@ -240,7 +249,7 @@ fn parse_and_evaluate3<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
             },
             Some(("!=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x != y { 1 } else { 0 }),
                     (Value::String(x), Value::String(y)) => res = Value::Integer(if x != y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
@@ -248,28 +257,28 @@ fn parse_and_evaluate3<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
             },
             Some(("<", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x < y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
             },
             Some((">=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x >= y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
             },
             Some((">", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x > y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
             },
             Some(("<=", _)) => {
                 let arg2 = parse_and_evaluate4(arg_iter, in_paren)?;
-                match (res, arg2) {
+                match (&res, &arg2) {
                     (Value::Integer(x), Value::Integer(y)) => res = Value::Integer(if x <= y { 1 } else { 0 }),
                     (_, _) => res = Value::Integer(0),
                 }
@@ -292,16 +301,18 @@ fn parse_and_evaluate3<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
     }
 }
 
-fn parse_and_evaluate2<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate2(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate3(arg_iter, in_paren)?;
     loop {
         match next_arg(arg_iter) {
             Some(("&", _)) => {
                 let arg2 = parse_and_evaluate3(arg_iter, in_paren)?;
-                match (res, arg2) {
-                    (Value::Integer(0) | Value::String(""), _) => res = Value::Integer(0),
-                    (_, Value::Integer(0) | Value::String("")) => res = Value::Integer(0),
+                match (&res, &arg2) {
+                    (Value::Integer(0), _) => res = Value::Integer(0),
+                    (Value::String(s), _) if s.is_empty() => res = Value::Integer(0),
+                    (_, Value::Integer(0)) => res = Value::Integer(0),
+                    (_, Value::String(s)) if s.is_empty() => res = Value::Integer(0),
                     (_, _) => (),
                 }
             },
@@ -322,17 +333,20 @@ fn parse_and_evaluate2<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, 
         }
     }
 }
-
-fn parse_and_evaluate1<'a>(arg_iter: &mut PushbackIter<Skip<Iter<'a, String>>>, in_paren: bool) -> Option<Value<'a>>
+fn parse_and_evaluate1(arg_iter: &mut PushbackIter<Skip<Iter<'_, String>>>, in_paren: bool) -> Option<Value>
 {
     let mut res = parse_and_evaluate2(arg_iter, in_paren)?;
     loop {
         match next_arg(arg_iter) {
             Some(("|", _)) => {
                 let arg2 = parse_and_evaluate2(arg_iter, in_paren)?;
-                match (res, arg2) {
-                    (Value::Integer(0) | Value::String(""), Value::Integer(0) | Value::String("")) => res = Value::Integer(0),
-                    (Value::Integer(0) | Value::String(""), _) => res = arg2,
+                match (&res, &arg2) {
+                    (Value::Integer(0), Value::Integer(0)) => res = Value::Integer(0),
+                    (Value::String(s), Value::Integer(0)) if s.is_empty() => res = Value::Integer(0),
+                    (Value::Integer(0), Value::String(s)) if s.is_empty() => res = Value::Integer(0),
+                    (Value::String(s), Value::String(t)) if s.is_empty() && t.is_empty() => res = Value::Integer(0),
+                    (Value::Integer(0), _) => res = arg2,
+                    (Value::String(s), _) if s.is_empty() => res = arg2,
                     (_, _) => (),
                 }
             },
