@@ -577,6 +577,31 @@ pub fn isatty(fd: i32) -> Result<bool>
     }    
 }
 
+pub fn getgroups() -> Result<Vec<gid_t>>
+{
+    let mut groups = vec![0; 1024];
+    let mut res = unsafe { libc::getgroups(1024, groups.as_mut_ptr()) };
+    if res == -1 {
+        let err = Error::last_os_error();
+        if err.kind() == ErrorKind::InvalidInput {
+            res = unsafe { libc::getgroups(0, groups.as_mut_ptr()) };
+            if res == -1 {
+                return Err(Error::last_os_error());
+            }
+            let size = res;
+            groups.resize(size as usize, 0 as gid_t);
+            res = unsafe { libc::getgroups(size, groups.as_mut_ptr()) };
+            if res == -1 {
+                return Err(Error::last_os_error());
+            }
+        } else {
+            return Err(err);
+        }
+    }
+    groups.resize(res as usize, 0 as gid_t);
+    Ok(groups)
+}
+
 pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata) -> bool
 {

@@ -26,6 +26,7 @@ pub mod expr;
 pub mod r#false;
 pub mod mv;
 pub mod rm;
+pub mod test;
 pub mod r#true;
 pub mod wc;
 
@@ -33,6 +34,7 @@ type AppletFunction = fn(&[String]) -> i32;
 
 pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
 {
+    applet_funs.insert(String::from("["), test::main);
     applet_funs.insert(String::from("basename"), basename::main);
     applet_funs.insert(String::from("cat"), cat::main);
     applet_funs.insert(String::from("cp"), cp::main);
@@ -42,6 +44,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("false"), r#false::main);
     applet_funs.insert(String::from("mv"), mv::main);
     applet_funs.insert(String::from("rm"), rm::main);
+    applet_funs.insert(String::from("test"), test::main);
     applet_funs.insert(String::from("true"), r#true::main);
     applet_funs.insert(String::from("wc"), wc::main);
 }

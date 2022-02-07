@@ -10,3 +10,4 @@ license = "GPL-3.0-or-later"
 [dependencies]
 getopt = "1.1.3"
 libc = "0.2.113"
+users = "0.11.0"
