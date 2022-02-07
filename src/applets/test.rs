@@ -407,7 +407,11 @@ fn parse_and_test1(arg_iter: &mut PushbackIter<Iter<'_, String>>, in_paren: bool
 fn parse_and_test(args: &[String]) -> Option<bool>
 {
     let mut arg_iter = PushbackIter::new(args.iter());
-    match arg_iter.next().map(|s| s.as_str()) {
+    let applet_name = match arg_iter.next() {
+        Some(applet_path) => Path::new(applet_path).file_name(),
+        None              => None,
+    };
+    match applet_name.map(|a| a.to_str().unwrap()) {
         Some("[") => {
             match next_arg(&mut arg_iter) {
                 Some(("]", _)) => {
@@ -445,7 +449,10 @@ fn parse_and_test(args: &[String]) -> Option<bool>
             }
         }
         Some(_) => parse_and_test1(&mut arg_iter, false, false),    
-        None => Some(false),
+        None => {
+            eprintln!("No applet name");
+            None
+        },
     }
 }
 
