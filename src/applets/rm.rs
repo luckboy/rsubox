@@ -134,7 +134,7 @@ pub fn main(args: &[String]) -> i32
                             }
                     }))
                 } else {
-                    non_recursively_do(path, DoFlag::NoDereference, !opts.force_flag, &mut (|path, metadata| {
+                    non_recursively_do(path, DoFlag::NoDereference, !opts.force_flag, false, &mut (|path, metadata| {
                             rm_file(path, metadata, &opts)
                     }))
                 };

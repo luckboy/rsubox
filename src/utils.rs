@@ -602,7 +602,7 @@ pub fn getgroups() -> Result<Vec<gid_t>>
     Ok(groups)
 }
 
-pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
+pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, is_action_for_dir: bool, f: &mut F) -> bool
   where F: FnMut(&Path, &fs::Metadata) -> bool
 {
     let metadata = match flag {
@@ -611,7 +611,7 @@ pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_n
     };
     match metadata {
         Ok(metadata) => {
-            if !metadata.file_type().is_dir() {
+            if is_action_for_dir || !metadata.file_type().is_dir() {
                 f(path.as_ref(), &metadata)
             } else {
                 eprintln!("{} is a directory", path.as_ref().to_string_lossy());

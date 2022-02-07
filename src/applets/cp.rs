@@ -243,7 +243,7 @@ pub fn main(args: &[String]) -> i32
                                     (is_success, true)
                             }))
                         } else {
-                            non_recursively_do(src_path, opts.do_flag, true, &mut (|src_path, src_metadata| {
+                            non_recursively_do(src_path, opts.do_flag, true, false, &mut (|src_path, src_metadata| {
                                     dst_metadata_stack_r.push(fs::metadata(dst_path_buf_r.as_path()));
                                     let is_success = match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                         Ok(dst_metadata) => {
