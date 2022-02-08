@@ -654,7 +654,7 @@ pub fn mkdir_for_copy<P: AsRef<Path>>(path: P, metadata: &fs::Metadata) -> bool
 {
     let saved_mask = umask(0);
     let mut dir_builder = DirBuilder::new();
-    dir_builder.mode((metadata.permissions().mode() & !saved_mask) | 0700);
+    dir_builder.mode((metadata.permissions().mode() & !saved_mask) | 0o700);
     let res = dir_builder.create(path.as_ref());
     umask(saved_mask);
     match res {
