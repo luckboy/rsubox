@@ -62,7 +62,7 @@ fn preserve<P: AsRef<Path>>(src_metadata: &fs::Metadata, dst_path: P) -> bool
 fn are_same_files(metadata1: &fs::Metadata, metadata2: Option<&fs::Metadata>) -> bool
 {
     match metadata2 {
-        Some(metadata2) =>metadata1.dev() == metadata2.dev() && metadata1.ino() == metadata2.ino(),
+        Some(metadata2) => metadata1.dev() == metadata2.dev() && metadata1.ino() == metadata2.ino(),
         None            => false
     }
 }
