@@ -18,6 +18,7 @@
 use std::fs;
 use std::fs::*;
 use std::io::*;
+use std::os::unix::fs::DirBuilderExt;
 use std::os::unix::fs::PermissionsExt;
 use std::path::*;
 use getopt::Opt;
@@ -31,7 +32,12 @@ struct Options
 
 fn mkdir<P: AsRef<Path>>(path: P, opts: &Options, is_err_for_already_exists: bool, is_perm_setting: bool) -> bool
 {
-    let (mut is_success, is_created) = match create_dir(path.as_ref()) {
+    let saved_mask = umask(0);
+    let mut dir_builder = DirBuilder::new();
+    dir_builder.mode((0o777 & !saved_mask) | 0o700);
+    let res = dir_builder.create(path.as_ref());
+    umask(saved_mask);
+    let (mut is_success, is_created) = match res {
         Ok(()) => (true, true),
         Err(err) if !is_err_for_already_exists && err.kind() == ErrorKind::AlreadyExists => (true, false),
         Err(err) => {
