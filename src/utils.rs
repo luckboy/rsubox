@@ -329,7 +329,7 @@ impl Mode
     pub fn parse(s: &str) -> Option<Mode>
     {
         match u32::from_str_radix(s, 8) {
-            Ok(x)  => Some(Mode::Number(x)),
+            Ok(x)  => Some(Mode::Number(x & 0o7777)),
             Err(_) => {
                 let mut clauses: Vec<ModeClause> = Vec::new();
                 for clause_s in s.split(',') {
