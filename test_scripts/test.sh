@@ -34,6 +34,7 @@ start_test_suites
 . ./test_scripts/basename_tests.sh
 . ./test_scripts/cat_tests.sh
 . ./test_scripts/chgrp_tests.sh
+. ./test_scripts/chmod_tests.sh
 . ./test_scripts/chown_tests.sh
 . ./test_scripts/cp_tests.sh
 . ./test_scripts/dirname_tests.sh
