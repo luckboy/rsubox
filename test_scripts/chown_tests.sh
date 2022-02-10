@@ -360,3 +360,11 @@ start_test chown "chown complains on too few arguments for no owner"
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Too few arguments' ../test_tmp/stderr.txt
 end_test
+
+start_test chown "chown complains on non-existent file"
+    "../$RSUBOX" chown "`id -un`" xxx  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
+end_test

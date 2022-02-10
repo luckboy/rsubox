@@ -336,3 +336,11 @@ start_test chgrp "chgrp complains on too few arguments for no group"
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Too few arguments' ../test_tmp/stderr.txt
 end_test
+
+start_test chgrp "chgrp complains on non-existent file"
+    "../$RSUBOX" chgrp "`id -gn`" xxx  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
+end_test
