@@ -663,9 +663,13 @@ end_test
 start_test cp "cp recursively copies fifo file"
     mkfifo xxx
     chmod 600 xxx
+    saved_mask="`umask`"
+    umask 2
     "../$RSUBOX" cp -R xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+    status="$?"
+    umask "$saved_mask"
 
-    assert 1 [ 0 = "$?" ] &&
+    assert 1 [ 0 = "$status" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_size 3 0 ../test_tmp/stderr.txt &&
     assert_existent_file 4 xxx &&
