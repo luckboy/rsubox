@@ -31,6 +31,22 @@ start_test test "test tests some condition for bracket"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test test "test tests no condition"
+    "../$RSUBOX" test > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 1 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
+start_test test "test tests no condition for bracket"
+    "../$RSUBOX" [ ] > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 1 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test test "test tests expression with logical-OR operator"
     "../$RSUBOX" test abc -o abc > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
@@ -368,7 +384,7 @@ start_test test "test tests non-zero string length condition for string with zer
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests FIFO condition for FIFO"
+start_test test "test tests fifo condition for fifo"
     mkfifo xxx
     "../$RSUBOX" test -p xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
@@ -377,7 +393,7 @@ start_test test "test tests FIFO condition for FIFO"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests FIFO condition for other file"
+start_test test "test tests fifo condition for other file"
     echo xxx > xxx
     "../$RSUBOX" test -p xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
@@ -386,7 +402,7 @@ start_test test "test tests FIFO condition for other file"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests FIFO condition for non-existent file"
+start_test test "test tests fifo condition for non-existent file"
     "../$RSUBOX" test -p xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 1 = "$?" ] &&
@@ -758,6 +774,14 @@ end_test
 
 start_test test "test complains on bracket and some string"
     "../$RSUBOX" [ xxx ] xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 2 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Syntax error' ../test_tmp/stderr.txt
+end_test
+
+start_test test "test complains on bracket and some string for no condition"
+    "../$RSUBOX" [ ] xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
