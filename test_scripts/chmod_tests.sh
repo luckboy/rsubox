@@ -466,7 +466,7 @@ start_test chmod "chmod sets read and set-user/group-ID permissions for symbolic
     assert_file_mode 5 '^-r-Sr-Sr--' xxx
 end_test
 
-start_test chmod "chmod sets read permissions and doesn't set set-user/group-ID permission for other permissions and symbolic mode"
+start_test chmod "chmod sets read permission and doesn't set set-user/group-ID permission for other permissions and symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod o=rs xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
