@@ -20,17 +20,29 @@ if [ "$RSUBOX" = "" ]; then
     RSUBOX=target/debug/rsubox
 fi
 
+if [ "$TEST_BLOCK_DEVICE" = "" ]; then
+    TEST_BLOCK_DEVICE=/dev/sda
+fi
+
+if [ "$TEST_CHAR_DEVICE" = "" ]; then
+    TEST_CHAR_DEVICE=/dev/tty0
+fi
+
 . ./test_scripts/lib.sh
 
 start_test_suites
 . ./test_scripts/basename_tests.sh
 . ./test_scripts/cat_tests.sh
+. ./test_scripts/chgrp_tests.sh
+. ./test_scripts/chown_tests.sh
 . ./test_scripts/cp_tests.sh
 . ./test_scripts/dirname_tests.sh
 . ./test_scripts/echo_tests.sh
+. ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
 . ./test_scripts/mv_tests.sh
 . ./test_scripts/rm_tests.sh
+. ./test_scripts/test_tests.sh
 . ./test_scripts/true_tests.sh
 . ./test_scripts/wc_tests.sh
 end_test_suites
