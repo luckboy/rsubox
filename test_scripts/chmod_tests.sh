@@ -184,7 +184,7 @@ start_test chmod "chmod adds search permissions for executable file and symbolic
     assert_file_mode 5 '^-rwxr-xr-x' xxx
 end_test
 
-start_test chmod "chmod adds set-user/group-id permissions for symbolic mode"
+start_test chmod "chmod adds set-user/group-ID permissions for symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod ug+s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -196,7 +196,7 @@ start_test chmod "chmod adds set-user/group-id permissions for symbolic mode"
     assert_file_mode 5 '^-rwSrwSr--' xxx
 end_test
 
-start_test chmod "chmod doesn't add set-user/group-id permission for other permissions and symbolic mode"
+start_test chmod "chmod doesn't add set-user/group-ID permission for other permissions and symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod o+s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -335,7 +335,7 @@ start_test chmod "chmod deletes search permissions for executable file and symbo
     assert_file_mode 5 '^-rwxr--r--' xxx
 end_test
 
-start_test chmod "chmod deletes set-user/group-id permissions for symbolic mode"
+start_test chmod "chmod deletes set-user/group-ID permissions for symbolic mode"
     echo xxx > xxx
     chmod 7664 xxx
     "../$RSUBOX" chmod ug-s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -347,7 +347,7 @@ start_test chmod "chmod deletes set-user/group-id permissions for symbolic mode"
     assert_file_mode 5 '^-rw-rw-r-T' xxx
 end_test
 
-start_test chmod "chmod doesn't delete set-user/group-id permission for other permissions and symbolic mode"
+start_test chmod "chmod doesn't delete set-user/group-ID permission for other permissions and symbolic mode"
     echo xxx > xxx
     chmod 7664 xxx
     "../$RSUBOX" chmod o-s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -454,7 +454,7 @@ start_test chmod "chmod sets read and search permissions for executable file and
     assert_file_mode 5 '^-r-xr-xr-x' xxx
 end_test
 
-start_test chmod "chmod sets read and set-user/group-id permissions for symbolic mode"
+start_test chmod "chmod sets read and set-user/group-ID permissions for symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod ug=rs xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -466,7 +466,7 @@ start_test chmod "chmod sets read and set-user/group-id permissions for symbolic
     assert_file_mode 5 '^-r-Sr-Sr--' xxx
 end_test
 
-start_test chmod "chmod sets read permissions and doesn't set set-user/group-id permission for other permissions and symbolic mode"
+start_test chmod "chmod sets read permissions and doesn't set set-user/group-ID permission for other permissions and symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod o=rs xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -538,7 +538,7 @@ start_test chmod "chmod sets other permissions as group permissions for symbolic
     assert_file_mode 5 '^-rw-r--r--' xxx
 end_test
 
-start_test chmod "chmod doesn't set set-user-id permission as group permissions for symbolic mode"
+start_test chmod "chmod doesn't set set-user-ID permission as group permissions for symbolic mode"
     echo xxx > xxx
     chmod 4644 xxx
     "../$RSUBOX" chmod g=u xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -550,7 +550,7 @@ start_test chmod "chmod doesn't set set-user-id permission as group permissions 
     assert_file_mode 5 '^-rwSrw-r--' xxx
 end_test
 
-start_test chmod "chmod doesn't set set-group-id permission as user permissions for symbolic mode"
+start_test chmod "chmod doesn't set set-group-ID permission as user permissions for symbolic mode"
     echo xxx > xxx
     chmod 2664 xxx
     "../$RSUBOX" chmod u=g xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt

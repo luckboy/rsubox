@@ -660,7 +660,7 @@ start_test cp "cp doesn't make directory for interactive option"
     assert_file_content 15 yyy dst/src/yyy
 end_test
 
-start_test cp "cp recursively copies fifo file"
+start_test cp "cp recursively copies FIFO file"
     mkfifo xxx
     chmod 600 xxx
     saved_mask="`umask`"
