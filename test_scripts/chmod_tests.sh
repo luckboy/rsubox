@@ -196,7 +196,7 @@ start_test chmod "chmod adds set-user/group-id permissions for symbolic mode"
     assert_file_mode 5 '^-rwSrwSr--' xxx
 end_test
 
-start_test chmod "chmod doesn't add set-user/group-id permissions for other permissions and symbolic mode"
+start_test chmod "chmod doesn't add set-user/group-id permission for other permissions and symbolic mode"
     echo xxx > xxx
     chmod 664 xxx
     "../$RSUBOX" chmod o+s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -300,6 +300,89 @@ start_test chmod "chmod deletes write permissions for no who and symbolic mode"
     assert_file_mode 5 '^-r--r--rw-' xxx
 end_test
 
+start_test chmod "chmod deletes search permissions for directory and symbolic mode"
+    mkdir -m 755 xxx
+    "../$RSUBOX" chmod go-X xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^drwxr--r--' xxx
+end_test
+
+start_test chmod "chmod doesn't delete search permissions for file and symbolic mode"
+    echo xxx > xxx
+    chmod 644 xxx
+    "../$RSUBOX" chmod go-X xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-r--r--' xxx
+end_test
+
+start_test chmod "chmod deletes search permissions for executable file and symbolic mode"
+    echo xxx > xxx
+    chmod 755 xxx
+    "../$RSUBOX" chmod go-X xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rwxr--r--' xxx
+end_test
+
+start_test chmod "chmod deletes set-user/group-id permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 7664 xxx
+    "../$RSUBOX" chmod ug-s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-rw-r-T' xxx
+end_test
+
+start_test chmod "chmod doesn't delete set-user/group-id permission for other permissions and symbolic mode"
+    echo xxx > xxx
+    chmod 7664 xxx
+    "../$RSUBOX" chmod o-s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rwSrwSr-T' xxx
+end_test
+
+start_test chmod "chmod deletes sticky bit permission for symbolic mode"
+    echo xxx > xxx
+    chmod 7664 xxx
+    "../$RSUBOX" chmod o-t xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rwSrwSr--' xxx
+end_test
+
+start_test chmod "chmod doesn't add sticky bit permission for user and group permissions and symbolic mode"
+    echo xxx > xxx
+    chmod 7664 xxx
+    "../$RSUBOX" chmod ug-t xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rwSrwSr-T' xxx
+end_test
+
 start_test chmod "chmod sets read permissions for symbolic mode"
     echo xxx > xxx
     chmod 611 xxx
@@ -334,6 +417,89 @@ start_test chmod "chmod sets read and execute permissions for symbolic mode"
     assert_file_size 3 0 ../test_tmp/stderr.txt &&
     assert_existent_file 4 xxx &&
     assert_file_mode 5 '^-rwxr-xr-x' xxx
+end_test
+
+start_test chmod "chmod sets read and search permissions for directory and symbolic mode"
+    mkdir -m 644 xxx
+    "../$RSUBOX" chmod a=rX xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^dr-xr-xr-x' xxx
+end_test
+
+start_test chmod "chmod sets read permissions and doesn't set search permissions for file and symbolic mode"
+    echo xxx > xxx
+    chmod 644 xxx
+    "../$RSUBOX" chmod a=rX xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-r--r--r--' xxx
+end_test
+
+start_test chmod "chmod sets read and search permissions for executable file and symbolic mode"
+    echo xxx > xxx
+    chmod 645 xxx
+    "../$RSUBOX" chmod ug=rX xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-r-xr-xr-x' xxx
+end_test
+
+start_test chmod "chmod sets read and set-user/group-id permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 664 xxx
+    "../$RSUBOX" chmod ug=rs xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-r-Sr-Sr--' xxx
+end_test
+
+start_test chmod "chmod sets read permissions and doesn't set set-user/group-id permission for other permissions and symbolic mode"
+    echo xxx > xxx
+    chmod 664 xxx
+    "../$RSUBOX" chmod o=rs xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-rw-r--' xxx
+end_test
+
+start_test chmod "chmod sets read and sticky bit permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 660 xxx
+    "../$RSUBOX" chmod o=rt xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-rw-r-T' xxx
+end_test
+
+start_test chmod "chmod sets read permissions and doesn't add sticky bit permission for user and group permissions and symbolic mode"
+    echo xxx > xxx
+    chmod 664 xxx
+    "../$RSUBOX" chmod ug=rt xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-r--r--r--' xxx
 end_test
 
 start_test chmod "chmod sets user permissions as group permissions for symbolic mode"
