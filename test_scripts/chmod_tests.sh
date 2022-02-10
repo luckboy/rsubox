@@ -300,6 +300,42 @@ start_test chmod "chmod deletes write permissions for no who and symbolic mode"
     assert_file_mode 5 '^-r--r--rw-' xxx
 end_test
 
+start_test chmod "chmod sets read permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 611 xxx
+    "../$RSUBOX" chmod go=r xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-r--r--' xxx
+end_test
+
+start_test chmod "chmod sets read and write permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 554 xxx
+    "../$RSUBOX" chmod ug=rw xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rw-rw-r--' xxx
+end_test
+
+start_test chmod "chmod sets read and execute permissions for symbolic mode"
+    echo xxx > xxx
+    chmod 700 xxx
+    "../$RSUBOX" chmod go=rx xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt &&
+    assert_existent_file 4 xxx &&
+    assert_file_mode 5 '^-rwxr-xr-x' xxx
+end_test
+
 start_test chmod "chmod sets user permissions as group permissions for symbolic mode"
     echo xxx > xxx
     chmod 644 xxx
