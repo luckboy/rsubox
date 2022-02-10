@@ -448,7 +448,15 @@ fn parse_and_test(args: &[String]) -> Option<bool>
                 },
             }
         }
-        Some(_) => parse_and_test1(&mut arg_iter, false, false),    
+        Some(_) => {
+            match next_arg(&mut arg_iter) {
+                Some((_, s)) => {
+                    arg_iter.undo(s);
+                    parse_and_test1(&mut arg_iter, false, false)
+                },
+                None => Some(false),
+            }
+        },
         None => {
             eprintln!("No applet name");
             None
