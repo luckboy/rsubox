@@ -269,7 +269,7 @@ start_test test "test tests regular file condition for non-existent file"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-group-ID condition for file with set-group-ID flag"
+start_test test "test tests set-group-id condition for file with set-group-ID flag"
     echo xxx > xxx
     chmod 2655 xxx
     "../$RSUBOX" test -g xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -279,7 +279,7 @@ start_test test "test tests set-group-ID condition for file with set-group-ID fl
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-group-ID condition for file without set-group-ID flag"
+start_test test "test tests set-group-id condition for file without set-group-ID flag"
     echo xxx > xxx
     "../$RSUBOX" test -g xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
@@ -288,7 +288,7 @@ start_test test "test tests set-group-ID condition for file without set-group-ID
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-group-ID condition for non-existent file"
+start_test test "test tests set-group-id condition for non-existent file"
     "../$RSUBOX" test -g xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 1 = "$?" ] &&
@@ -497,7 +497,7 @@ start_test test "test tests terminal file descriptor condition for file descript
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-user-ID condition for file with set-user-ID flag"
+start_test test "test tests set-user-id condition for file with set-user-ID flag"
     echo xxx > xxx
     chmod 4655 xxx
     "../$RSUBOX" test -u xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
@@ -507,7 +507,7 @@ start_test test "test tests set-user-ID condition for file with set-user-ID flag
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-user-ID condition for file without set-user-ID flag"
+start_test test "test tests set-user-id condition for file without set-user-ID flag"
     echo xxx > xxx
     "../$RSUBOX" test -u xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
@@ -516,7 +516,7 @@ start_test test "test tests set-user-ID condition for file without set-user-ID f
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test test "test tests set-user-ID condition for non-existent file"
+start_test test "test tests set-user-id condition for non-existent file"
     "../$RSUBOX" test -u xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 1 = "$?" ] &&
