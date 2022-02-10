@@ -276,7 +276,7 @@ fn parse_and_test4(arg_iter: &mut PushbackIter<Iter<'_, String>>) -> Option<bool
                 Some(("-ne", _)) => {
                     let x = get_integer_from_string(&s)?;
                     let y = next_integer(arg_iter)?;
-                    Some(x == y)
+                    Some(x != y)
                 },
                 Some(("-lt", _)) => {
                     let x = get_integer_from_string(&s)?;
