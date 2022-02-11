@@ -308,10 +308,10 @@ enum ModePermListOrPermCopy
 #[derive(Copy, Clone)]
 struct ModePermList
 {
-    has_readable: bool,
-    has_writable: bool,
-    has_executable: bool,
-    has_searchable: bool,
+    has_reading: bool,
+    has_writing: bool,
+    has_executing: bool,
+    has_searching: bool,
     has_set_id: bool,
     has_sticky: bool,
 }
@@ -384,19 +384,19 @@ impl Mode
                             },
                             None => {
                                 let mut perm_list = ModePermList {
-                                    has_readable: false,
-                                    has_writable: false,
-                                    has_executable: false,
-                                    has_searchable: false,
+                                    has_reading: false,
+                                    has_writing: false,
+                                    has_executing: false,
+                                    has_searching: false,
                                     has_set_id: false,
                                     has_sticky: false,
                                 };
                                 loop {
                                     match clause_s_iter.next() {
-                                        Some('r') => perm_list.has_readable = true,
-                                        Some('w') => perm_list.has_writable = true,
-                                        Some('x') => perm_list.has_executable = true,
-                                        Some('X') => perm_list.has_searchable = true,
+                                        Some('r') => perm_list.has_reading = true,
+                                        Some('w') => perm_list.has_writing = true,
+                                        Some('x') => perm_list.has_executing = true,
+                                        Some('X') => perm_list.has_searching = true,
                                         Some('s') => perm_list.has_set_id = true,
                                         Some('t') => perm_list.has_sticky = true,
                                         Some(c)   => {
@@ -448,10 +448,10 @@ impl Mode
                         let mut perm_mode = 0;
                         match action.perm {
                             ModePermListOrPermCopy::List(perm_list) => {
-                                if perm_list.has_readable { perm_mode |= 0o444; }
-                                if perm_list.has_writable { perm_mode |= 0o222; }
-                                if perm_list.has_executable { perm_mode |= 0o111; }
-                                if perm_list.has_searchable && (is_dir || (current_mode & 0o111) != 0)  { perm_mode |= 0o111; }
+                                if perm_list.has_reading { perm_mode |= 0o444; }
+                                if perm_list.has_writing { perm_mode |= 0o222; }
+                                if perm_list.has_executing { perm_mode |= 0o111; }
+                                if perm_list.has_searching && (is_dir || (current_mode & 0o111) != 0)  { perm_mode |= 0o111; }
                                 if perm_list.has_set_id { perm_mode |= 0o6000; }
                                 if perm_list.has_sticky { perm_mode |= 0o1000; }
                             },
