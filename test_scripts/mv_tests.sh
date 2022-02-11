@@ -396,7 +396,7 @@ start_test mv "mv preserves directory status"
     assert_file_mtime 10 2002 dst
 end_test
 
-start_test mv "mv moves fifo file"
+start_test mv "mv moves FIFO file"
     mkfifo xxx
     echo -n | "../$RSUBOX" mv -N xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
