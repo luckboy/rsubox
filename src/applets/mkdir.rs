@@ -15,11 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-use std::fs;
 use std::fs::*;
 use std::io::*;
 use std::os::unix::fs::DirBuilderExt;
-use std::os::unix::fs::PermissionsExt;
 use std::path::*;
 use getopt::Opt;
 use crate::utils::*;
@@ -48,31 +46,8 @@ fn mkdir<P: AsRef<Path>>(path: P, opts: &Options, is_err_for_already_exists: boo
     };
     if is_success && is_created && is_perm_setting {
         is_success = match opts.mode {
-            Some(mode) => {
-                match fs::metadata(path.as_ref()) {
-                    Ok(metadata) => {
-                        if metadata.file_type().is_dir() {
-                            let mut perms = metadata.permissions();
-                            perms.set_mode(mode);
-                            match set_permissions(path.as_ref(), perms) {
-                                Ok(())   => true,
-                                Err(err) => {
-                                    eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
-                                    false
-                                },
-                            }
-                        } else {
-                            eprintln!("{}: Not a directory", path.as_ref().to_string_lossy());
-                            false
-                        }
-                    },
-                    Err(err) => {
-                        eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
-                        false
-                    },
-                }
-            },
-            None => true,
+            Some(mode) => set_mode(path.as_ref(), mode),
+            None       => true,
         };
     }
     is_success

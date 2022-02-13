@@ -755,6 +755,25 @@ pub fn access_for_remove<P: AsRef<Path>>(path: P, is_success: &mut bool) -> bool
     }
 }
 
+fn metadata_and_set_permissions<P: AsRef<Path>>(path: P, mode: u32) -> Result<()>
+{
+    let metadata = fs::metadata(path.as_ref())?;
+    let mut perms = metadata.permissions();
+    perms.set_mode(mode);
+    set_permissions(path.as_ref(), perms)
+}
+
+pub fn set_mode<P: AsRef<Path>>(path: P, mode: u32) -> bool
+{
+    match metadata_and_set_permissions(path.as_ref(), mode) {
+        Ok(())   => true,
+        Err(err) => {
+            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
+            false
+        },
+    }
+}
+
 pub fn access<P: AsRef<Path>>(path: P, mode: i32) -> Result<bool>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
