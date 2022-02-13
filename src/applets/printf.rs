@@ -237,7 +237,7 @@ fn parse_format(format_iter: &mut PushbackIter<Chars>) -> Option<Option<Conversi
 
 fn convert_chars(conv_spec: &ConversionSpecification, arg: &str)
 {
-    let field_width = conv_spec.field_width.unwrap_or(1);
+    let field_width = conv_spec.field_width.unwrap_or(0);
     let filled_char_count = field_width - (arg.len() as isize);
     if !conv_spec.minus_flag {
         if filled_char_count > 0 {
@@ -351,7 +351,9 @@ fn convert_integer(conv_spec: &ConversionSpecification, arg_iter: &mut Skip<Iter
         (Some(false), SignFlag::Plus | SignFlag::Space) => filled_char_count -= 1,
         (_, _) => (),
     }
-    if conv_spec.hash_flag { filled_char_count -= prefix.len() as isize; }
+    if conv_spec.hash_flag && !((prefix == "0x" || prefix == "0X") && s2.is_empty()) { 
+        filled_char_count -= prefix.len() as isize;
+    }
     let filled_space_count = if conv_spec.zero_flag && !conv_spec.minus_flag && conv_spec.precision.is_none() {
         filled_zero_count = max(filled_zero_count, filled_char_count);
         0
