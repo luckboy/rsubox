@@ -1059,7 +1059,7 @@ pub fn abbreviated_week_day_name(week_day: i32) -> Option<&'static str>
 }
 
 pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, is_action_for_dir: bool, f: &mut F) -> bool
-  where F: FnMut(&Path, &fs::Metadata) -> bool
+    where F: FnMut(&Path, &fs::Metadata) -> bool
 {
     let metadata = match flag {
         DoFlag::NoDereference => fs::symlink_metadata(path.as_ref()),
@@ -1086,7 +1086,7 @@ pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_n
 }
 
 fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, is_err_for_not_found: bool, name: Option<&OsStr>, f: &mut F) -> bool
-  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
+    where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let metadata = match (flag, name) {
         (DoFlag::NoDereference, _) => fs::symlink_metadata(path_buf.as_path()),
@@ -1142,7 +1142,7 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, is_err_
 }
 
 pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
-  where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
+    where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let mut path_buf = path.as_ref().to_path_buf();
     recursively_do_from_path_buf(&mut path_buf, flag, is_err_for_not_found, None, f)
