@@ -908,7 +908,7 @@ pub fn getgrouplist<S: AsRef<OsStr>>(user: S, group: gid_t) -> Option<Vec<gid_t>
         groups.resize(size as usize, 0 as gid_t); 
         res = unsafe { libc::getgrouplist(user_cstring.as_ptr(), group, groups.as_mut_ptr(), &mut size as *mut i32) };
         if res == -1 {
-            return None
+            return None;
         }
     }
     groups.resize(size as usize, 0 as gid_t);
