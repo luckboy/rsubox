@@ -31,6 +31,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::os::unix::fs::symlink;
 use std::path;
 use std::path::*;
+use std::ptr::null;
 use std::ptr::null_mut;
 use std::result;
 use std::str::*;
@@ -50,6 +51,22 @@ pub struct Times
 {
     pub atime: TimeValue,
     pub mtime: TimeValue,
+}
+
+#[derive(Clone)]
+pub struct Tm
+{
+    pub sec: i32,
+    pub min: i32,
+    pub hour: i32,
+    pub mday: i32,
+    pub mon: i32,
+    pub year: i32,
+    pub wday: i32,
+    pub yday: i32,
+    pub isdst: i32,
+    pub gmtoff: i64,
+    pub zone: Option<CString>,
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -879,6 +896,164 @@ pub fn getgroups() -> Result<Vec<gid_t>>
     }
     groups.resize(res as usize, 0 as gid_t);
     Ok(groups)
+}
+
+pub fn getgrouplist<S: AsRef<OsStr>>(user: S, group: gid_t) -> Option<Vec<gid_t>>
+{
+    let mut groups = vec![0; 1024];
+    let mut size = 1024;
+    let user_cstring = CString::new(user.as_ref().as_bytes()).unwrap();
+    let mut res = unsafe { libc::getgrouplist(user_cstring.as_ptr(), group, groups.as_mut_ptr(), &mut size as *mut i32) };
+    if res == -1 {
+        groups.resize(size as usize, 0 as gid_t); 
+        res = unsafe { libc::getgrouplist(user_cstring.as_ptr(), group, groups.as_mut_ptr(), &mut size as *mut i32) };
+        if res == -1 {
+            return None
+        }
+    }
+    groups.resize(size as usize, 0 as gid_t);
+    Some(groups)
+}
+
+fn libc_tm_to_tm(libc_tm: &libc::tm) -> Tm
+{
+    let zone = if !libc_tm.tm_zone.is_null() {
+        let zone_cstr = unsafe { CStr::from_ptr(libc_tm.tm_zone) };
+        Some(CString::new(zone_cstr.to_bytes()).unwrap())
+    } else {
+        None
+    };
+    Tm {
+        sec: libc_tm.tm_sec,
+        min: libc_tm.tm_min,
+        hour: libc_tm.tm_hour,
+        mday: libc_tm.tm_mday,
+        mon: libc_tm.tm_mon,
+        year: libc_tm.tm_year,
+        wday: libc_tm.tm_wday,
+        yday: libc_tm.tm_yday,
+        isdst: libc_tm.tm_isdst,
+        gmtoff: libc_tm.tm_gmtoff as i64,
+        zone,
+    }
+}
+
+fn tm_to_libc_tm(tm: &Tm) -> libc::tm
+{
+    let zone = tm.zone.as_ref().map_or(null(), |z| z.as_ptr());
+    libc::tm {
+        tm_sec: tm.sec,
+        tm_min: tm.min,
+        tm_hour: tm.hour,
+        tm_mday: tm.mday,
+        tm_mon: tm.mon,
+        tm_year: tm.year,
+        tm_wday: tm.wday,
+        tm_yday: tm.yday,
+        tm_isdst: tm.isdst,
+        tm_gmtoff: tm.gmtoff as libc::c_long,
+        tm_zone: zone,
+    }
+}
+
+pub fn gmtime(time: i64) -> Result<Tm>
+{
+    let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
+    let res = unsafe { libc::gmtime_r(&time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    if !res.is_null() {
+        Ok(libc_tm_to_tm(&libc_tm))
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn localtime(time: i64) -> Result<Tm>
+{
+    let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
+    let res = unsafe { libc::localtime_r(&time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    if !res.is_null() {
+        Ok(libc_tm_to_tm(&libc_tm))
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn mktime(tm: &mut Tm) -> Result<i64>
+{
+    let mut libc_tm = tm_to_libc_tm(tm);
+    let res = unsafe { libc::mktime(&mut libc_tm as *mut libc::tm) };
+    *tm = libc_tm_to_tm(&mut libc_tm);
+    if res != -1 {
+        Ok(res as i64)
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn month_name(month: i32) -> Option<&'static str>
+{
+    match month {
+        0  => Some("January"),
+        1  => Some("February"),
+        2  => Some("March"),
+        3  => Some("April"),
+        4  => Some("May"),
+        5  => Some("June"),
+        6  => Some("July"),
+        7  => Some("August"),
+        8  => Some("September"),
+        9  => Some("October"),
+        10 => Some("November"),
+        11 => Some("December"),
+        _  => None,
+    }
+}
+
+pub fn abbreviated_month_name(month: i32) -> Option<&'static str>
+{
+    match month {
+        0  => Some("Jan"),
+        1  => Some("Feb"),
+        2  => Some("Mar"),
+        3  => Some("Apr"),
+        4  => Some("May"),
+        5  => Some("Jun"),
+        6  => Some("Jul"),
+        7  => Some("Aug"),
+        8  => Some("Sep"),
+        9  => Some("Oct"),
+        10 => Some("Nov"),
+        11 => Some("Dec"),
+        _  => None,
+    }
+}
+
+pub fn week_day_name(week_day: i32) -> Option<&'static str>
+{
+    match week_day {
+        0 => Some("Sunday"),
+        1 => Some("Monday"),
+        2 => Some("Tuesday"),
+        3 => Some("Wednesday"),
+        4 => Some("Thursday"),
+        5 => Some("Friday"),
+        6 => Some("Saturday"),
+        _ => None,
+    }
+}
+
+pub fn abbreviated_week_day_name(week_day: i32) -> Option<&'static str>
+{
+    match week_day {
+        0 => Some("Sun"),
+        1 => Some("Mon"),
+        2 => Some("Tue"),
+        3 => Some("Wed"),
+        4 => Some("Thu"),
+        5 => Some("Fri"),
+        6 => Some("Sat"),
+        _ => None,
+    }
 }
 
 pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, is_action_for_dir: bool, f: &mut F) -> bool
