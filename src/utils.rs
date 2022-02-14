@@ -959,7 +959,8 @@ fn tm_to_libc_tm(tm: &Tm) -> libc::tm
 pub fn gmtime(time: i64) -> Result<Tm>
 {
     let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
-    let res = unsafe { libc::gmtime_r(&time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    let libc_time = time as libc::time_t;
+    let res = unsafe { libc::gmtime_r(&libc_time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
     if !res.is_null() {
         Ok(libc_tm_to_tm(&libc_tm))
     } else {
@@ -970,7 +971,8 @@ pub fn gmtime(time: i64) -> Result<Tm>
 pub fn localtime(time: i64) -> Result<Tm>
 {
     let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
-    let res = unsafe { libc::localtime_r(&time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    let libc_time = time as libc::time_t;
+    let res = unsafe { libc::localtime_r(&libc_time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
     if !res.is_null() {
         Ok(libc_tm_to_tm(&libc_tm))
     } else {
