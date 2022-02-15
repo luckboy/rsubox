@@ -18,6 +18,7 @@
 use std::char;
 use std::io::*;
 use std::iter::Iterator;
+use std::cmp::Ordering;
 use std::ffi::*;
 use std::fmt;
 use std::fs;
@@ -83,6 +84,14 @@ pub enum  DoAction
     DirActionBeforeList,
     FileAction,
     DirActionAfterList,
+}
+
+#[derive(Clone)]
+pub struct DoEntry
+{
+    pub name: OsString,
+    pub metadata: fs::Metadata,
+    pub link: Option<PathBuf>,
 }
 
 pub trait PushbackIterator: Iterator
@@ -1147,6 +1156,176 @@ pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_f
     let mut path_buf = path.as_ref().to_path_buf();
     recursively_do_from_path_buf(&mut path_buf, flag, is_err_for_not_found, None, f)
 }
+
+fn is_dir_for_ls<P: AsRef<Path>>(path: P, flag: DoFlag, is_parent_from_dir: bool, is_success: &mut bool) -> bool
+{
+    let (metadata, is_symlink) = match (flag, is_parent_from_dir) {
+        (DoFlag::NoDereference, _) => (fs::symlink_metadata(path.as_ref()), true),
+        (DoFlag::NonRecursiveDereference, false) => (fs::metadata(path.as_ref()), false),
+        (DoFlag::NonRecursiveDereference, true) => (fs::symlink_metadata(path.as_ref()), true),
+        (DoFlag::RecursiveDereference, _) => (fs::metadata(path.as_ref()), false),
+    };
+    match metadata {
+        Ok(metadata) => metadata.file_type().is_dir(),
+        Err(err) if !is_symlink && (err.kind() == ErrorKind::NotFound || err.raw_os_error().map(|e| e == libc::ELOOP).unwrap_or(false)) => false,
+        Err(err) => {
+            eprintln!("4 {}: {}", path.as_ref().to_string_lossy(), err);
+            *is_success = false;
+            false
+        }
+    }
+}
+
+fn names_to_do_entries<F>(path_buf: &mut PathBuf, names: &mut [OsString], flag: DoFlag, are_sorted: bool, are_reversed: bool, are_names_from_dir: bool, f: &mut F) -> Option<Vec<DoEntry>>
+    where F: FnMut(&DoEntry, &DoEntry) -> Ordering
+{
+    let mut entries: Vec<DoEntry> = Vec::new();
+    for name in names.iter() {
+        if name != &OsString::from(".") || !are_names_from_dir { path_buf.push(name); }
+        let (mut metadata, is_symlink) = match (flag, are_names_from_dir) {
+            (DoFlag::NoDereference, _) => (fs::symlink_metadata(path_buf.as_path()), true),
+            (DoFlag::NonRecursiveDereference, false) => (fs::metadata(path_buf.as_path()), false),
+            (DoFlag::NonRecursiveDereference, true) => (fs::symlink_metadata(path_buf.as_path()), true),
+            (DoFlag::RecursiveDereference, _) => (fs::metadata(path_buf.as_path()), false),
+        };
+        metadata = match metadata {
+            Ok(metadata) => Ok(metadata),
+            Err(err) if !is_symlink && (err.kind() == ErrorKind::NotFound || err.raw_os_error().map(|e| e == libc::ELOOP).unwrap_or(false)) => fs::symlink_metadata(path_buf.as_path()),
+            Err(err) => Err(err),
+        };
+        let is_success = match metadata {
+            Ok(metadata) => {
+                let link = if metadata.file_type().is_symlink() {
+                    match read_link(path_buf.as_path()) {
+                        Ok(path_buf) => Some(path_buf),
+                        Err(_)       => None,
+                    }
+                } else {
+                    None
+                };
+                entries.push(DoEntry { name: name.clone(), metadata, link });
+                true
+            },
+            Err(err) => {
+                eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                false
+            },
+        };
+        if are_names_from_dir {
+            if name != &OsString::from(".")  || !are_names_from_dir { path_buf.pop(); }
+        } else {
+            path_buf.clear();
+        }
+        if !is_success {
+            return None;
+        }
+    }
+    if are_sorted { entries.sort_by(|e1, e2| f(e1, e2)); }
+    if are_reversed { entries.reverse(); }
+    Some(entries)
+}
+
+fn do_from_path_buf_for_ls<F, G, H>(path_buf: &mut PathBuf, file_names: &mut [OsString], dir_names: &mut [OsString], flag: DoFlag, is_recursive: bool, are_sorted: bool, are_reversed: bool, is_preceded_dir_path: bool, are_names_from_dir: bool, f: &mut F, g: &mut G, h: &mut H) -> bool
+    where F: FnMut(&OsString) -> bool,
+          G: FnMut(&DoEntry, &DoEntry) -> Ordering,
+          H: FnMut(Option<&Path>, bool, &[DoEntry])
+{
+    match names_to_do_entries(path_buf, file_names, flag, are_sorted, are_reversed, are_names_from_dir, g) {
+        Some(file_entries) => {
+            let dir_path = if are_names_from_dir {
+                Some(path_buf.as_path())
+            } else {
+                None
+            };
+            h(dir_path, is_preceded_dir_path, &file_entries);
+            if is_recursive || !are_names_from_dir {
+                match names_to_do_entries(path_buf, dir_names, flag, are_sorted, are_reversed, are_names_from_dir, g) {
+                    Some(dir_entries) => {
+                        let mut is_success = true;
+                        for dir_entry in &dir_entries {
+                            path_buf.push(dir_entry.name.as_os_str());
+                            let mut file_names: Vec<OsString> = Vec::new();
+                            let mut dir_names: Vec<OsString> = Vec::new();
+                            file_names.push(OsString::from("."));
+                            file_names.push(OsString::from(".."));
+                            match read_dir(path_buf.as_path()) {
+                                Ok(entries) => {
+                                    for entry in entries {
+                                        match entry {
+                                            Ok(entry) => {
+                                                file_names.push(entry.file_name());
+                                                path_buf.push(entry.file_name());
+                                                if is_dir_for_ls(path_buf.as_path(), flag, true, &mut is_success) {
+                                                    dir_names.push(entry.file_name());
+                                                }
+                                                path_buf.pop();
+                                            },
+                                            Err(err) => {
+                                                eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                                                is_success = false;
+                                            },
+                                        }
+                                    }
+                                },
+                                Err(err) => {
+                                    eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                                    is_success = false;
+                                },
+                            }
+                            if is_success {
+                                let mut file_names: Vec<OsString> = file_names.iter().filter(|n| f(n)).map(|n| n.clone()).collect();
+                                let mut dir_names: Vec<OsString> = dir_names.iter().filter(|n| f(n)).map(|n| n.clone()).collect();
+                                let is_preceded_dir_path = is_recursive || dir_entries.len() > 1 || !file_entries.is_empty();
+                                do_from_path_buf_for_ls(path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, is_preceded_dir_path, true, f, g, h);
+                            }
+                            if are_names_from_dir {
+                                path_buf.pop();
+                            } else {
+                                path_buf.clear();
+                            }
+                        }
+                        is_success
+                    },
+                    None => false,
+                }
+            } else {
+                true
+            }
+        },
+        None => false,
+    }
+}
+
+pub fn do_for_ls<F, G, H>(names: &[OsString], flag: DoFlag, is_recursive: bool, are_sorted: bool, are_reversed: bool, are_dirs_as_files: bool, f: &mut F, g: &mut G, h: &mut H) -> bool
+    where F: FnMut(&OsString) -> bool,
+          G: FnMut(&DoEntry, &DoEntry) -> Ordering,
+          H: FnMut(Option<&Path>, bool, &[DoEntry])
+{
+    let mut file_names: Vec<OsString> = Vec::new();
+    let mut dir_names: Vec<OsString> = Vec::new();
+    let mut is_success = true;
+    for name in names.iter() {
+        if !are_dirs_as_files {
+            if is_dir_for_ls(name, flag, false, &mut is_success) {
+                dir_names.push(name.clone());
+            } else {
+                if is_success {
+                    file_names.push(name.clone());
+                } else {
+                    break;
+                }
+            }
+        } else {
+            file_names.push(name.clone());
+        }
+    }
+    if is_success {
+        let mut path_buf = PathBuf::new();
+        is_success = do_from_path_buf_for_ls(&mut path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, false, false, f, g, h);
+    }
+    is_success
+}
+
 
 pub fn get_dest_path_and_dir_flag<'a>(paths: &mut Vec<&'a String>) -> Option<(&'a String, bool)>
 {

@@ -27,6 +27,7 @@ pub mod dirname;
 pub mod echo;
 pub mod expr;
 pub mod r#false;
+pub mod ls;
 pub mod mkdir;
 pub mod mv;
 pub mod printf;
@@ -51,6 +52,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("echo"), echo::main);
     applet_funs.insert(String::from("expr"), expr::main);
     applet_funs.insert(String::from("false"), r#false::main);
+    applet_funs.insert(String::from("ls"), ls::main);
     applet_funs.insert(String::from("mkdir"), mkdir::main);
     applet_funs.insert(String::from("mv"), mv::main);
     applet_funs.insert(String::from("printf"), printf::main);
