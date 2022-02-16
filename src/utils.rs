@@ -1335,7 +1335,6 @@ pub fn do_for_ls<F, G, H>(names: &[OsString], flag: DoFlag, is_recursive: bool, 
     is_success
 }
 
-
 pub fn get_dest_path_and_dir_flag<'a>(paths: &mut Vec<&'a String>) -> Option<(&'a String, bool)>
 {
     if paths.len() >= 2 {
