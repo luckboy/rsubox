@@ -1276,7 +1276,7 @@ fn do_from_path_buf_for_ls<F, G, H>(path_buf: &mut PathBuf, file_names: &mut [Os
                                 let mut file_names: Vec<OsString> = file_names.iter().filter(|n| f(n)).map(|n| n.clone()).collect();
                                 let mut dir_names: Vec<OsString> = dir_names.iter().filter(|n| f(n)).map(|n| n.clone()).collect();
                                 let is_preceded_dir_path = is_recursive || dir_entries.len() > 1 || !file_entries.is_empty();
-                                do_from_path_buf_for_ls(path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, is_preceded_dir_path, true, f, g, h);
+                                is_success = do_from_path_buf_for_ls(path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, is_preceded_dir_path, true, f, g, h);
                             }
                             if are_names_from_dir {
                                 path_buf.pop();
