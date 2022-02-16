@@ -456,14 +456,8 @@ fn print_short_format_entry_for_multi_columns(format_entry: &ShortFormatEntry, m
     print_short_format_entry(format_entry, max_lens);
     if are_spaces {
         let mut all_len = 0;
-        match &format_entry.inode {
-            Some(s) => all_len += s.as_str().chars().fold(0, |x, _| x + 1) + 1,
-            None    => (),
-        }
-        match &format_entry.blocks {
-            Some(s) => all_len += s.as_str().chars().fold(0, |x, _| x + 1) + 1,
-            None    => (),
-        }
+        all_len += max_lens.max_inode_len.map(|l| l + 1).unwrap_or(0);
+        all_len += max_lens.max_blocks_len.map(|l| l + 1).unwrap_or(0);
         all_len += format_entry.name.as_str().chars().fold(0, |x, _| x + 1);
         let filled_space_count = (max_all_len + 1) - all_len;
         if filled_space_count > 0 {
