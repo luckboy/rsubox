@@ -1266,6 +1266,7 @@ fn do_from_path_buf_for_ls<F, G, H>(path_buf: &mut PathBuf, file_names: &mut [Os
                                                     dir_names.push(entry.file_name());
                                                 }
                                                 path_buf.pop();
+                                                if !is_success { break; }
                                             },
                                             Err(err) => {
                                                 eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
