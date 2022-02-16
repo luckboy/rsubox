@@ -684,6 +684,46 @@ fn print_long_format_entries(format_entries: &[LongFormatEntry], max_lens: &Long
     }
 }
 
+fn print_short_format_entries_for_comma_format(format_entries: &[ShortFormatEntry], column_count: usize)
+{
+    let mut line_len = 0;
+    let mut is_first_in_line = true;
+    for (i, format_entry) in format_entries.iter().enumerate() {
+        let mut all_len = 0;
+        match &format_entry.inode {
+            Some(s) => all_len += s.as_str().chars().fold(0, |x, _| x + 1) + 1,
+            None    => (),
+        }
+        match &format_entry.blocks {
+            Some(s) => all_len += s.as_str().chars().fold(0, |x, _| x + 1) + 1,
+            None    => (),
+        }
+        all_len += format_entry.name.as_str().chars().fold(0, |x, _| x + 1);
+        if !is_first_in_line && line_len + (all_len + 1 + (if !is_first_in_line { 1 } else { 0 })) > column_count {
+            println!("");
+            line_len = all_len + 1;
+            is_first_in_line = false;
+        } else {
+            if !is_first_in_line { print!(" "); }
+            line_len += all_len + 1 + (if !is_first_in_line { 1 } else { 0 });
+            is_first_in_line = false;
+        }
+        match &format_entry.inode {
+            Some(s) => print!("{} ", s),
+            None    => (),
+        }
+        match &format_entry.blocks {
+            Some(s) => print!("{} ", s),
+            None    => (),
+        }
+        print!("{}", format_entry.name);
+        if i + 1 < format_entries.len() {
+            print!(",");
+        }
+    }
+    println!("");
+}
+
 fn ls_files(is_dir_path: bool, entries: &[DoEntry], opts: &Options, current_tm: &Tm, column_count: usize)
 {
     match opts.format_flag {
@@ -701,7 +741,8 @@ fn ls_files(is_dir_path: bool, entries: &[DoEntry], opts: &Options, current_tm: 
             print_long_format_entries(&format_entries, &max_lens);
         },
         FormatFlag::Comma => {
-            // Not implemented.
+            let format_entries = entries_to_short_format_entries(entries, opts);
+            print_short_format_entries_for_comma_format(&format_entries, column_count);
         },
     }
 }
