@@ -1172,7 +1172,7 @@ fn is_dir_for_ls<P: AsRef<Path>>(path: P, flag: DoFlag, is_parent_from_dir: bool
             eprintln!("4 {}: {}", path.as_ref().to_string_lossy(), err);
             *is_success = false;
             false
-        }
+        },
     }
 }
 
@@ -1195,16 +1195,23 @@ fn names_to_do_entries<F>(path_buf: &mut PathBuf, names: &mut [OsString], flag: 
         };
         let is_success = match metadata {
             Ok(metadata) => {
-                let link = if metadata.file_type().is_symlink() {
+                let (link, is_success) = if metadata.file_type().is_symlink() {
                     match read_link(path_buf.as_path()) {
-                        Ok(path_buf) => Some(path_buf),
-                        Err(_)       => None,
+                        Ok(path_buf) => (Some(path_buf), true),
+                        Err(err)     => {
+                            eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                            (None, false)
+                        },
                     }
                 } else {
-                    None
+                    (None, true)
                 };
-                entries.push(DoEntry { name: name.clone(), metadata, link });
-                true
+                if is_success {
+                    entries.push(DoEntry { name: name.clone(), metadata, link });
+                    true
+                } else {
+                    false
+                }
             },
             Err(err) => {
                 eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
@@ -1263,6 +1270,7 @@ fn do_from_path_buf_for_ls<F, G, H>(path_buf: &mut PathBuf, file_names: &mut [Os
                                             Err(err) => {
                                                 eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
                                                 is_success = false;
+                                                break;
                                             },
                                         }
                                     }
