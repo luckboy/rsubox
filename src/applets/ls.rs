@@ -856,23 +856,19 @@ pub fn main(args: &[String]) -> i32
     }
     let mut is_preceded_newline = false;
     let is_preceded_newline_r = &mut is_preceded_newline;
-    let is_success = do_for_ls(&names, opts.do_flag, opts.recursive_flag, !opts.force_flag, opts.reverse_flag, opts.directory_flag, &mut (|name| {
-            if opts.all_flag {
-                all_filter(name)
-            } else {
-                filter(name)
-            }
-    }), &mut (|entry1, entry2| {
-            if !opts.sorting_by_time_flag {
-                compare_names(entry1, entry2)
-            } else {
-                match opts.time_flag {
-                    TimeFlag::LastAccess           => compare_last_access_times(entry1, entry2),
-                    TimeFlag::LastDataModification => compare_last_data_modification_times(entry1, entry2),
-                    TimeFlag::LastModification     => compare_last_modification_times(entry1, entry2),
-                }
-            }
-    }), &mut (|dir_path, is_preceded_dir_path, entries| {
+    let mut f: fn(&OsString) -> bool = filter;
+    if opts.all_flag {
+        f = all_filter;
+    }
+    let mut g: fn(&DoEntry, &DoEntry) -> Ordering = compare_names;
+    if opts.sorting_by_time_flag {
+        g = match opts.time_flag {
+            TimeFlag::LastAccess           => compare_last_access_times,
+            TimeFlag::LastDataModification => compare_last_data_modification_times,
+            TimeFlag::LastModification     => compare_last_modification_times,
+        };
+    }
+    let is_success = do_for_ls(&names, opts.do_flag, opts.recursive_flag, !opts.force_flag, opts.reverse_flag, opts.directory_flag, &mut f, &mut g, &mut (|dir_path, is_preceded_dir_path, entries| {
             match (dir_path, is_preceded_dir_path) {
                 (Some(dir_path), true) => {
                     if *is_preceded_newline_r { println!(""); }
