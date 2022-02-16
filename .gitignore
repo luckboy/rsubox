@@ -2,4 +2,5 @@
 /test_root
 /test_tmp
 /test_counts
+/test_dir
 /Cargo.lock
