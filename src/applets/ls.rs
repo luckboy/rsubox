@@ -468,18 +468,6 @@ fn print_short_format_entry_for_multi_columns(format_entry: &ShortFormatEntry, m
     }
 }
 
-fn print_empty(max_all_len: usize, are_spaces: bool)
-{
-    if are_spaces {
-        let filled_space_count = max_all_len + 1;
-        if filled_space_count > 0 {
-            for _ in 0..filled_space_count {
-                print!(" ");
-            }
-        }
-    }
-}
-
 fn print_short_format_entries_for_none(format_entries: &[ShortFormatEntry], max_lens: &ShortFormatMaxLengths)
 {
     for format_entry in format_entries.iter() {
@@ -510,10 +498,8 @@ fn print_short_format_entries_for_up_to_down(format_entries: &[ShortFormatEntry]
                 Some(format_entry) => print_short_format_entry_for_multi_columns(&format_entry, max_lens, max_all_len, j + 1 < format_column_count && space_tab[j * format_row_count + i]),
                 None => (),
             }
-            if j + 1 >= format_column_count {
-                println!("");
-            }
         }
+        println!("");
     }
 }
 
@@ -537,12 +523,10 @@ fn print_short_format_entries_for_left_to_right(format_entries: &[ShortFormatEnt
         for j in 0..format_column_count {
             match format_entries.get(i * format_column_count + j) {
                 Some(format_entry) => print_short_format_entry_for_multi_columns(&format_entry, max_lens, max_all_len, j + 1 < format_column_count  && space_tab[i * format_column_count + j]),
-                None => print_empty(max_all_len, j + 1 < format_row_count),
-            }
-            if j + 1 >= format_column_count {
-                println!("");
+                None => (),
             }
         }
+        println!("");
     }
 }
 
