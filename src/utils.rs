@@ -1169,7 +1169,7 @@ fn is_dir_for_ls<P: AsRef<Path>>(path: P, flag: DoFlag, is_parent_from_dir: bool
         Ok(metadata) => metadata.file_type().is_dir(),
         Err(err) if !is_symlink && (err.kind() == ErrorKind::NotFound || err.raw_os_error().map(|e| e == libc::ELOOP).unwrap_or(false)) => false,
         Err(err) => {
-            eprintln!("4 {}: {}", path.as_ref().to_string_lossy(), err);
+            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
             *is_success = false;
             false
         },
