@@ -27,14 +27,18 @@ pub mod dirname;
 pub mod echo;
 pub mod expr;
 pub mod r#false;
+pub mod link;
+pub mod ln;
 pub mod ls;
 pub mod mkdir;
+pub mod mkfifo;
 pub mod mv;
 pub mod printf;
 pub mod rm;
 pub mod rmdir;
 pub mod test;
 pub mod r#true;
+pub mod unlink;
 pub mod wc;
 
 type AppletFunction = fn(&[String]) -> i32;
@@ -52,13 +56,17 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("echo"), echo::main);
     applet_funs.insert(String::from("expr"), expr::main);
     applet_funs.insert(String::from("false"), r#false::main);
+    applet_funs.insert(String::from("link"), link::main);
+    applet_funs.insert(String::from("ln"), ln::main);
     applet_funs.insert(String::from("ls"), ls::main);
     applet_funs.insert(String::from("mkdir"), mkdir::main);
+    applet_funs.insert(String::from("mkfifo"), mkfifo::main);
     applet_funs.insert(String::from("mv"), mv::main);
     applet_funs.insert(String::from("printf"), printf::main);
     applet_funs.insert(String::from("rm"), rm::main);
     applet_funs.insert(String::from("rmdir"), rmdir::main);
     applet_funs.insert(String::from("test"), test::main);
     applet_funs.insert(String::from("true"), r#true::main);
+    applet_funs.insert(String::from("unlink"), unlink::main);
     applet_funs.insert(String::from("wc"), wc::main);
 }

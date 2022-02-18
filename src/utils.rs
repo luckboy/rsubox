@@ -826,6 +826,18 @@ pub fn mknod<P: AsRef<Path>>(path: P, mode: u32, dev: u64) -> Result<()>
     }
 }
 
+pub fn mkfifo<P: AsRef<Path>>(path: P, mode: u32) -> Result<()>
+{
+    let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
+    let res = unsafe { libc::mkfifo(path_cstring.as_ptr(), mode as libc::mode_t) };
+    if res != -1 {
+        Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+
 pub fn chown<P: AsRef<Path>>(path: P, uid: uid_t, gid: gid_t) -> Result<()>
 {
     let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
