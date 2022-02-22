@@ -884,6 +884,26 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 pub fn umask(mask: u32) -> u32 
 { unsafe { libc::umask(mask as libc::mode_t) as u32 } }
 
+pub fn dup2(old_fd: i32, new_fd: i32) -> Result<()>
+{
+    let res = unsafe { libc::dup2(old_fd, new_fd) };
+    if res != -1 {
+        Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn close(fd: i32) -> Result<()>
+{
+    let res = unsafe { libc::close(fd) };
+    if res != -1 {
+        Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
 pub fn isatty(fd: i32) -> Result<bool>
 {
     let res = unsafe { libc::isatty(fd) };

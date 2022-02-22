@@ -23,6 +23,7 @@ pub mod chgrp;
 pub mod chmod;
 pub mod chown;
 pub mod cp;
+pub mod dd;
 pub mod dirname;
 pub mod echo;
 pub mod expr;
@@ -52,6 +53,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("chmod"), chmod::main);
     applet_funs.insert(String::from("chown"), chown::main);
     applet_funs.insert(String::from("cp"), cp::main);
+    applet_funs.insert(String::from("dd"), dd::main);
     applet_funs.insert(String::from("dirname"), dirname::main);
     applet_funs.insert(String::from("echo"), echo::main);
     applet_funs.insert(String::from("expr"), expr::main);
