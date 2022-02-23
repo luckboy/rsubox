@@ -636,8 +636,8 @@ fn dd_file<F>(opts: &Options, f: F) -> bool
                     if is_success {
                         is_success = dd_stream(&mut input_file, &mut output_file, input_path, output_path, opts, &mut data, f);
                     }
-                    if is_success && opts.sync_conversion {
-                        is_success = sync_all_file_for_dd(&mut output_file, output_path);
+                    if opts.sync_conversion {
+                        is_success &= sync_all_file_for_dd(&mut output_file, output_path);
                     }
                     print_records(&data);
                     is_success
