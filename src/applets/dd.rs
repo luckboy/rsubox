@@ -338,7 +338,7 @@ fn dd_stream_for_one_buffer<F>(input_file: &mut File, output_file: &mut File, in
         loop {
             match opts.count {
                 Some(count) => {
-                    if data.full_input_block_count + data.full_input_block_count >= count {
+                    if data.full_input_block_count + data.partial_input_block_count >= count {
                         break;
                     }
                 },
@@ -515,7 +515,7 @@ fn dd_stream_for_two_buffers<F>(input_file: &mut File, output_file: &mut File, i
         loop {
             match opts.count {
                 Some(count) => {
-                    if data.full_input_block_count + data.full_input_block_count >= count {
+                    if data.full_input_block_count + data.partial_input_block_count >= count {
                         break;
                     }
                 },
