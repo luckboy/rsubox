@@ -358,18 +358,20 @@ fn dd_stream_for_one_buffer<F>(input_file: &mut File, output_file: &mut File, in
                 break;
             }
             if n == 0 && tmp_is_success { break; }
-            convert(opts, data, f);
-            let (n, tmp_is_success) = write_for_dd(output_file, &data.first_buffer[0..data.input_count], output_path);
-            if n > 0 {
-                if n >= opts.output_block_size{
-                    data.full_output_block_count += 1;
-                } else {
-                    data.partial_output_block_count += 1;
+            if data.input_count > 0 {
+                convert(opts, data, f);
+                let (n, tmp_is_success) = write_for_dd(output_file, &data.first_buffer[0..data.input_count], output_path);
+                if n > 0 {
+                    if n >= opts.output_block_size {
+                        data.full_output_block_count += 1;
+                    } else {
+                        data.partial_output_block_count += 1;
+                    }
                 }
-            }
-            if !tmp_is_success {
-                is_success = false;
-                break;
+                if !tmp_is_success {
+                    is_success = false;
+                    break;
+                }
             }
         }
     }
@@ -535,21 +537,23 @@ fn dd_stream_for_two_buffers<F>(input_file: &mut File, output_file: &mut File, i
                 break;
             }
             if n == 0 && tmp_is_success { break; }
-            convert(opts, data, f);
-            let tmp_is_success = match opts.block_conversion {
-                BlockConversion::None    => write_first_buffer_for_none(output_file, output_path, opts, data),
-                BlockConversion::Block   => write_first_buffer_for_block(output_file, output_path, opts, data),
-                BlockConversion::Unblock => write_first_buffer_for_unblock(output_file, output_path, opts, data),
-            };
-            if !tmp_is_success {
-                is_success = false;
-                break;
+            if data.input_count > 0 {
+                convert(opts, data, f);
+                let tmp_is_success = match opts.block_conversion {
+                    BlockConversion::None    => write_first_buffer_for_none(output_file, output_path, opts, data),
+                    BlockConversion::Block   => write_first_buffer_for_block(output_file, output_path, opts, data),
+                    BlockConversion::Unblock => write_first_buffer_for_unblock(output_file, output_path, opts, data),
+                };
+                if !tmp_is_success {
+                    is_success = false;
+                    break;
+                }
             }
         }
     }
     if is_success {
         is_success = match opts.block_conversion {
-            BlockConversion::None    => false,
+            BlockConversion::None    => true,
             BlockConversion::Block   => write_end_of_file_for_block(output_file, output_path, opts, data),
             BlockConversion::Unblock => write_end_of_file_for_unblock(output_file, output_path, opts, data),
         };
