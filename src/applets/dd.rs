@@ -281,6 +281,7 @@ fn skip(file: &mut File, buf: &mut [u8], count: u64, path: Option<&Path>, opts: 
         is_success = true;
         for _ in 0..count {
             match read_for_dd(file, buf, path) {
+                (0, true)  => break,
                 (_, true)  => (),
                 (_, false) => {
                     is_success = false;
