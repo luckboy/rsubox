@@ -20,7 +20,6 @@ use std::fs::*;
 use std::os::unix::io::FromRawFd;
 use std::os::unix::io::IntoRawFd;
 use std::os::unix::io::RawFd;
-use std::os::unix::fs::FileTypeExt;
 use std::path::*;
 use libc;
 use crate::utils::*;
@@ -617,19 +616,20 @@ fn dd_file<F>(opts: &Options, f: F) -> bool
                     };
                     data.newline_char = f(data.newline_char, false);
                     data.space_char = f(data.space_char, false);
-                    let size = match (opts.output_block_size as u64).checked_mul(opts.seek.unwrap_or(0)) {
-                        Some(x) => x,
-                        None    => {
-                            eprintln!("Overflow");
-                            return false;
-                        },
-                    };
-                    let is_file_or_block_device = match output_file.metadata() {
-                        Ok(metadata) => metadata.file_type().is_file() || metadata.file_type().is_block_device(),
-                        Err(_)       => false,
-                    };
-                    let mut is_success = if is_file_or_block_device && !opts.no_trunc_conversion {
-                        set_file_len_for_dd(&mut output_file, size, output_path)
+                    let mut is_success = if !opts.no_trunc_conversion {
+                        match opts.seek {
+                            Some(count) => {
+                                let size = match (opts.output_block_size as u64).checked_mul(count) {
+                                    Some(x) => x,
+                                    None    => {
+                                        eprintln!("Overflow");
+                                        return false;
+                                    },
+                                };
+                                set_file_len_for_dd(&mut output_file, size, output_path)
+                            },
+                            None => true,
+                        }
                     } else {
                         true
                     };
