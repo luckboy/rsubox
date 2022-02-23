@@ -321,6 +321,16 @@ fn convert<F>(opts: &Options, data: &mut Data, f: F)
     }
 }
 
+fn skip_bad_block(input_file: &mut File, opts: &Options)
+{
+    loop {
+        match input_file.seek(SeekFrom::Current(opts.input_block_size as i64)) {
+            Err(err) if err.kind() == ErrorKind::Interrupted => (),
+            _ => break,
+        }
+    }
+}
+
 fn dd_stream_for_one_buffer<F>(input_file: &mut File, output_file: &mut File, input_path: Option<&Path>, output_path: Option<&Path>, opts: &Options, data: &mut Data, f: F) -> bool
     where F: Fn(u8, bool) -> u8 + Copy
 {
@@ -356,6 +366,9 @@ fn dd_stream_for_one_buffer<F>(input_file: &mut File, output_file: &mut File, in
             if !opts.no_error_conversion && !tmp_is_success {
                 is_success = false;
                 break;
+            }
+            if opts.no_error_conversion && !tmp_is_success {
+                skip_bad_block(input_file, opts);
             }
             if n == 0 && tmp_is_success { break; }
             if data.input_count > 0 {
@@ -535,6 +548,9 @@ fn dd_stream_for_two_buffers<F>(input_file: &mut File, output_file: &mut File, i
             if !opts.no_error_conversion && !tmp_is_success {
                 is_success = false;
                 break;
+            }
+            if opts.no_error_conversion && !tmp_is_success {
+                skip_bad_block(input_file, opts);
             }
             if n == 0 && tmp_is_success { break; }
             if data.input_count > 0 {
