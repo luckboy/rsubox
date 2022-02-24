@@ -1099,7 +1099,7 @@ pub fn abbreviated_week_day_name(week_day: i32) -> Option<&'static str>
     }
 }
 
-pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, is_action_for_dir: bool, f: &mut F) -> bool
+pub fn non_recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, is_action_for_dir: bool, mut f: F) -> bool
     where F: FnMut(&Path, &fs::Metadata) -> bool
 {
     let metadata = match flag {
@@ -1182,11 +1182,11 @@ fn recursively_do_from_path_buf<F>(path_buf: &mut PathBuf, flag: DoFlag, is_err_
     }
 }
 
-pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, f: &mut F) -> bool
+pub fn recursively_do<P: AsRef<Path>, F>(path: P, flag: DoFlag, is_err_for_not_found: bool, mut f: F) -> bool
     where F: FnMut(&Path, &fs::Metadata, Option<&OsStr>, DoAction) -> (bool, bool)
 {
     let mut path_buf = path.as_ref().to_path_buf();
-    recursively_do_from_path_buf(&mut path_buf, flag, is_err_for_not_found, None, f)
+    recursively_do_from_path_buf(&mut path_buf, flag, is_err_for_not_found, None, &mut f)
 }
 
 fn is_dir_for_ls<P: AsRef<Path>>(path: P, flag: DoFlag, is_parent_from_dir: bool, is_success: &mut bool) -> bool
@@ -1337,7 +1337,7 @@ fn do_from_path_buf_for_ls<F, G, H>(path_buf: &mut PathBuf, file_names: &mut [Os
     }
 }
 
-pub fn do_for_ls<F, G, H>(names: &[OsString], flag: DoFlag, is_recursive: bool, are_sorted: bool, are_reversed: bool, are_dirs_as_files: bool, f: &mut F, g: &mut G, h: &mut H) -> bool
+pub fn do_for_ls<F, G, H>(names: &[OsString], flag: DoFlag, is_recursive: bool, are_sorted: bool, are_reversed: bool, are_dirs_as_files: bool, mut f: F, mut g: G, mut h: H) -> bool
     where F: FnMut(&OsString) -> bool,
           G: FnMut(&DoEntry, &DoEntry) -> Ordering,
           H: FnMut(Option<&Path>, bool, &[DoEntry])
@@ -1362,7 +1362,7 @@ pub fn do_for_ls<F, G, H>(names: &[OsString], flag: DoFlag, is_recursive: bool, 
     }
     if is_success {
         let mut path_buf = PathBuf::new();
-        is_success = do_from_path_buf_for_ls(&mut path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, false, false, f, g, h);
+        is_success = do_from_path_buf_for_ls(&mut path_buf, &mut file_names, &mut dir_names, flag, is_recursive, are_sorted, are_reversed, false, false, &mut f, &mut g, &mut h);
     }
     is_success
 }

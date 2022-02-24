@@ -167,7 +167,7 @@ pub fn main(args: &[String]) -> i32
                         let dst_path_buf_r = &mut dst_path_buf;
                         let dst_metadata_stack_r = &mut dst_metadata_stack;
                         let is_success = if opts.recursive_flag {
-                            recursively_do(src_path, opts.do_flag, true, &mut (|src_path, src_metadata, name, action| {
+                            recursively_do(src_path, opts.do_flag, true, |src_path, src_metadata, name, action| {
                                     match action {
                                         DoAction::DirActionBeforeList | DoAction::FileAction => {
                                             match name {
@@ -241,9 +241,9 @@ pub fn main(args: &[String]) -> i32
                                         _ => (),
                                     }
                                     (is_success, true)
-                            }))
+                            })
                         } else {
-                            non_recursively_do(src_path, opts.do_flag, true, false, &mut (|src_path, src_metadata| {
+                            non_recursively_do(src_path, opts.do_flag, true, false, |src_path, src_metadata| {
                                     dst_metadata_stack_r.push(fs::metadata(dst_path_buf_r.as_path()));
                                     let is_success = match &dst_metadata_stack_r[dst_metadata_stack_r.len() - 1] {
                                         Ok(dst_metadata) => {
@@ -259,7 +259,7 @@ pub fn main(args: &[String]) -> i32
                                     };
                                     dst_metadata_stack_r.pop();
                                     is_success
-                            }))
+                            })
                         };
                         if !is_success { status = 1; }
                     },

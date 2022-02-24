@@ -126,17 +126,17 @@ pub fn main(args: &[String]) -> i32
             let (_, name) = dir_name_and_base_name(path.as_str(), None);
             if name != String::from(".") && name != String::from("..") {
                 let is_success = if opts.recursive_flag {
-                    recursively_do(path, DoFlag::NoDereference, !opts.force_flag, &mut (|path, metadata, _, action| {
+                    recursively_do(path, DoFlag::NoDereference, !opts.force_flag, |path, metadata, _, action| {
                             match action {
                                 DoAction::DirActionBeforeList => descend_into_dir(path, &opts),
                                 DoAction::FileAction => (rm_file(path, metadata, &opts), true),
                                 DoAction::DirActionAfterList => (rm_dir(path, &opts), true),
                             }
-                    }))
+                    })
                 } else {
-                    non_recursively_do(path, DoFlag::NoDereference, !opts.force_flag, false, &mut (|path, metadata| {
+                    non_recursively_do(path, DoFlag::NoDereference, !opts.force_flag, false, |path, metadata| {
                             rm_file(path, metadata, &opts)
-                    }))
+                    })
                 };
                 if !is_success { status = 1; }
             } else {

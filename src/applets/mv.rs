@@ -204,7 +204,7 @@ pub fn main(args: &[String]) -> i32
                         if is_success && is_exdev {
                             let dst_path_buf_r = &mut dst_path_buf;
                             let dst_metadata_stack_r = &mut dst_metadata_stack;
-                            is_success = recursively_do(src_path, DoFlag::NoDereference, true, &mut (|src_path, src_metadata, name, action| {
+                            is_success = recursively_do(src_path, DoFlag::NoDereference, true, |src_path, src_metadata, name, action| {
                                     match action {
                                         DoAction::DirActionBeforeList | DoAction::FileAction => {
                                             match name {
@@ -272,7 +272,7 @@ pub fn main(args: &[String]) -> i32
                                         _ => (),
                                     }
                                     (is_success, true)
-                            }));
+                            });
                         }
                         if !is_success { status = 1; } 
                     },

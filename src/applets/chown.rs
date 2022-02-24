@@ -131,17 +131,17 @@ pub fn main(args: &[String]) -> i32
             Some(uid_and_gid) => {
                 for path in args.iter().skip(1) {
                     let is_success = if opts.recursive_flag {
-                        recursively_do(path, opts.do_flag, true, &mut (|path, _, _, action| {
+                        recursively_do(path, opts.do_flag, true, |path, _, _, action| {
                                 match action {
                                     DoAction::DirActionBeforeList => (true, true),
                                     DoAction::FileAction          => (chown_file(path, uid_and_gid, &opts), true),
                                     DoAction::DirActionAfterList  => (chown_file(path, uid_and_gid, &opts), true),
                                 }
-                        }))
+                        })
                     } else {
-                        non_recursively_do(path, opts.do_flag, true, true, &mut (|path, _| {
+                        non_recursively_do(path, opts.do_flag, true, true, |path, _| {
                                 chown_file(path, uid_and_gid, &opts)
-                        }))
+                        })
                     };
                     if !is_success { status = 1; } 
                 }

@@ -72,17 +72,17 @@ pub fn main(args: &[String]) -> i32
             Some(mode) => {
                 for path in args.iter().skip(1) {
                     let is_success = if opts.recursive_flag {
-                        recursively_do(path, DoFlag::NonRecursiveDereference, true, &mut (|path, metadata, _, action| {
+                        recursively_do(path, DoFlag::NonRecursiveDereference, true, |path, metadata, _, action| {
                                 match action {
                                     DoAction::DirActionBeforeList => (chmod_file(path, metadata, &mode), true),
                                     DoAction::FileAction          => (chmod_file(path, metadata, &mode), true),
                                     DoAction::DirActionAfterList  => (true, true),
                                 }
-                        }))
+                        })
                     } else {
-                        non_recursively_do(path, DoFlag::NonRecursiveDereference, true, true, &mut (|path, metadata| {
+                        non_recursively_do(path, DoFlag::NonRecursiveDereference, true, true, |path, metadata| {
                                 chmod_file(path, metadata, &mode)
-                        }))
+                        })
                     };
                     if !is_success { status = 1; } 
                 }

@@ -852,7 +852,7 @@ pub fn main(args: &[String]) -> i32
             TimeFlag::LastModification     => compare_last_modification_times,
         };
     }
-    let is_success = do_for_ls(&names, opts.do_flag, opts.recursive_flag, !opts.force_flag, opts.reverse_flag, opts.directory_flag, &mut f, &mut g, &mut (|dir_path, is_preceded_dir_path, entries| {
+    let is_success = do_for_ls(&names, opts.do_flag, opts.recursive_flag, !opts.force_flag, opts.reverse_flag, opts.directory_flag, f, g, |dir_path, is_preceded_dir_path, entries| {
             match (dir_path, is_preceded_dir_path) {
                 (Some(dir_path), true) => {
                     if *is_preceded_newline_r { println!(""); }
@@ -864,6 +864,6 @@ pub fn main(args: &[String]) -> i32
                 ls_files(dir_path.is_some(), entries, &opts, &current_tm, column_count);
                 *is_preceded_newline_r = true;
             }
-    }));
+    });
     if is_success { 0 } else { 1 }
 }
