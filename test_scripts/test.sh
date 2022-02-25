@@ -43,6 +43,7 @@ start_test_suites
 . ./test_scripts/false_tests.sh
 . ./test_scripts/mkdir_tests.sh
 . ./test_scripts/mv_tests.sh
+. ./test_scripts/printf_tests.sh
 . ./test_scripts/rm_tests.sh
 . ./test_scripts/rmdir_tests.sh
 . ./test_scripts/test_tests.sh
