@@ -38,7 +38,7 @@ enum ConversionSpecifier
     LowerHexdecimal,
     UpperHexdecimal,
     Byte,
-    Character,
+    Char,
     String,
 }
 
@@ -215,7 +215,7 @@ fn parse_format(format_iter: &mut PushbackIter<Chars>) -> Option<Option<Conversi
                 Some('x')       => conv_spec.specifier = ConversionSpecifier::LowerHexdecimal,
                 Some('X')       => conv_spec.specifier = ConversionSpecifier::UpperHexdecimal,
                 Some('b')       => conv_spec.specifier = ConversionSpecifier::Byte,
-                Some('c')       => conv_spec.specifier = ConversionSpecifier::Character,
+                Some('c')       => conv_spec.specifier = ConversionSpecifier::Char,
                 Some('s')       => conv_spec.specifier = ConversionSpecifier::String,
                 Some(_)         => {
                     eprintln!("Invalid format character");
@@ -398,7 +398,7 @@ fn convert_arg(format_iter: &mut PushbackIter<Chars>, arg_iter: &mut Skip<Iter<'
         Some(Some(conv_spec)) => {
             match conv_spec.specifier {
                 ConversionSpecifier::Byte => convert_byte(&conv_spec, arg_iter),
-                ConversionSpecifier::Character => convert_char(&conv_spec, arg_iter),
+                ConversionSpecifier::Char => convert_char(&conv_spec, arg_iter),
                 ConversionSpecifier::String => convert_string(&conv_spec, arg_iter),
                 _ => convert_integer(&conv_spec, arg_iter),
             }
