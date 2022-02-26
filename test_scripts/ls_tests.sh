@@ -929,6 +929,42 @@ start_test ls "ls prints list of files for force option"
     assert_file_size 15 0 ../test_tmp/stderr.txt
 end_test
 
+start_test ls "ls turns -l, -t, -s and -r off for force option"
+    echo .config > .config
+    chmod 644 .config
+    echo aaa > aaa
+    chmod 644 aaa
+    echo asdfghjkl > asdfghjkl
+    chmod 644 asdfghjkl
+    ln -s aaa bbb
+    mkfifo -m 600 ccc
+    echo qwertyuiop > qwertyuiop
+    chmod 644 qwertyuiop
+    mkdir -m 755 test1
+    mkdir -m 755 test2
+    echo xxx > xxx
+    chmod 644 xxx
+    echo yyy > yyy
+    chmod 755 yyy
+    "../$RSUBOX" ls -fltsr > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_line_count 2 12 ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 3 1 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 4 2 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 5 3 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 6 4 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 7 5 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 8 6 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 9 7 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 10 8 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 11 9 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 12 10 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 13 11 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 14 12 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_size 15 0 ../test_tmp/stderr.txt
+end_test
+
 start_test ls "ls prints list of files for no owner option"
     echo .config > .config
     chmod 644 .config
