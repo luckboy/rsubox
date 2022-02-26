@@ -470,7 +470,7 @@ start_test ls "ls prints last modification times for long format"
     assert_file_size 6 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls prints access times for long format"
+start_test ls "ls prints last access times for long format"
     echo xxx > xxx
     chmod 644 xxx
     touch -at 200101010000.00 xxx
@@ -493,37 +493,47 @@ start_test ls "ls sorts by last data modification time"
     echo xxx > xxx
     chmod 644 xxx
     touch -at 200101010000.00 xxx
-    touch -mt 200201010000.00 xxx
+    touch -mt 200301010000.00 xxx
     echo yyy > yyy
     chmod 644 yyy
-    touch -at 200201010000.00 yyy
+    touch -at 200301010000.00 yyy
     touch -mt 200101010000.00 yyy
+    echo zzz > zzz
+    chmod 644 zzz
+    touch -at 200201010000.00 zzz
+    touch -mt 200201010000.00 zzz
     "../$RSUBOX" ls -t > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
     assert_file_line 3 1 xxx ../test_tmp/stdout.txt &&
-    assert_file_line 4 2 yyy ../test_tmp/stdout.txt &&
+    assert_file_line 3 2 zzz ../test_tmp/stdout.txt &&
+    assert_file_line 4 3 yyy ../test_tmp/stdout.txt &&
     assert_file_size 5 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls sorts by data modification time for long format"
+start_test ls "ls sorts by last data modification time for long format"
     echo xxx > xxx
     chmod 644 xxx
     touch -at 200101010000.00 xxx
-    touch -mt 200201010000.00 xxx
+    touch -mt 200301010000.00 xxx
     echo yyy > yyy
     chmod 644 yyy
-    touch -at 200201010000.00 yyy
+    touch -at 200301010000.00 yyy
     touch -mt 200101010000.00 yyy
+    echo zzz > zzz
+    chmod 644 zzz
+    touch -at 200201010000.00 zzz
+    touch -mt 200201010000.00 zzz
     "../$RSUBOX" ls -lt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^total [0-9][0-9]*' ../test_tmp/stdout.txt &&
-    assert_file_line_pattern 4 2 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2002 xxx' ../test_tmp/stdout.txt &&
-    assert_file_line_pattern 5 3 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2001 yyy' ../test_tmp/stdout.txt &&
-    assert_file_size 6 0 ../test_tmp/stderr.txt
+    assert_file_line_pattern 4 2 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2003 xxx' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 5 3 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2002 zzz' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 6 4 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2001 yyy' ../test_tmp/stdout.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
 start_test ls "ls sorts by last modification time"
@@ -531,66 +541,81 @@ start_test ls "ls sorts by last modification time"
     chmod 644 xxx
     echo yyy > yyy
     chmod 644 yyy
+    echo zzz > zzz
+    chmod 644 zzz
     "../$RSUBOX" ls -tc > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 4 2 '^..*' ../test_tmp/stdout.txt &&
-    assert_file_size 5 0 ../test_tmp/stderr.txt
+    assert_file_line_pattern 5 2 '^..*' ../test_tmp/stdout.txt &&
+    assert_file_size 6 0 ../test_tmp/stderr.txt
 end_test
-
 
 start_test ls "ls sorts by last modification time for long format"
     echo xxx > xxx
     chmod 644 xxx
     echo yyy > yyy
     chmod 644 yyy
+    echo zzz > zzz
+    chmod 644 zzz
     "../$RSUBOX" ls -ltc > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^total [0-9][0-9]*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 4 2 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 3 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *..*' ../test_tmp/stdout.txt &&
-    assert_file_size 6 0 ../test_tmp/stderr.txt
+    assert_file_line_pattern 6 4 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *..*' ../test_tmp/stdout.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls sorts by access time"
+start_test ls "ls sorts by last access time"
     echo xxx > xxx
     chmod 644 xxx
     touch -at 200101010000.00 xxx
-    touch -mt 200201010000.00 xxx
+    touch -mt 200301010000.00 xxx
     echo yyy > yyy
     chmod 644 yyy
-    touch -at 200201010000.00 yyy
+    touch -at 200301010000.00 yyy
     touch -mt 200101010000.00 yyy
+    echo zzz > zzz
+    chmod 644 zzz
+    touch -at 200201010000.00 zzz
+    touch -mt 200201010000.00 zzz
     "../$RSUBOX" ls -tu > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
     assert_file_line 3 1 yyy ../test_tmp/stdout.txt &&
-    assert_file_line 4 2 xxx ../test_tmp/stdout.txt &&
-    assert_file_size 5 0 ../test_tmp/stderr.txt
+    assert_file_line 4 2 zzz ../test_tmp/stdout.txt &&
+    assert_file_line 5 3 xxx ../test_tmp/stdout.txt &&
+    assert_file_size 6 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls sorts by access time for long format"
+start_test ls "ls sorts by last access time for long format"
     echo xxx > xxx
     chmod 644 xxx
     touch -at 200101010000.00 xxx
-    touch -mt 200201010000.00 xxx
+    touch -mt 200301010000.00 xxx
     echo yyy > yyy
     chmod 644 yyy
-    touch -at 200201010000.00 yyy
+    touch -at 200301010000.00 yyy
     touch -mt 200101010000.00 yyy
+    echo zzz > zzz
+    chmod 644 zzz
+    touch -at 200201010000.00 zzz
+    touch -mt 200201010000.00 zzz
     "../$RSUBOX" ls -ltu > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
-    assert_file_line_count 2 3 ../test_tmp/stdout.txt &&
+    assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^total [0-9][0-9]*' ../test_tmp/stdout.txt &&
-    assert_file_line_pattern 4 2 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2002 yyy' ../test_tmp/stdout.txt &&
-    assert_file_line_pattern 5 3 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2001 xxx' ../test_tmp/stdout.txt &&
-    assert_file_size 6 0 ../test_tmp/stderr.txt
+    assert_file_line_pattern 4 2 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2003 yyy' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 5 3 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2002 zzz' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 6 4 '^-rw-r--r--  *1 '"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9]  2001 xxx' ../test_tmp/stdout.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
 start_test ls "ls prints mode with set-user/group-ID and stick bit for long format"
