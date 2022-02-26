@@ -41,6 +41,7 @@ start_test_suites
 . ./test_scripts/echo_tests.sh
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
+. ./test_scripts/ls_tests.sh
 . ./test_scripts/mkdir_tests.sh
 . ./test_scripts/mv_tests.sh
 . ./test_scripts/printf_tests.sh
