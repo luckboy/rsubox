@@ -820,6 +820,7 @@ pub fn main(args: &[String]) -> i32
         opts.all_flag = true;
         opts.format_flag = FormatFlag::Short;
         opts.sorting_by_time_flag = false;
+        opts.reverse_flag = false;
         opts.size_flag = false;
     }
     if opts.multi_column_flag == MultiColumnFlag::None && is_default_multi_column_flag {
