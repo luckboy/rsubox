@@ -363,7 +363,7 @@ fn format_time(time: i64, current_tm: &Tm) -> String
     match localtime(time) {
         Ok(tm) => {
             let mut s = String::new();
-            s.push_str(format!("{} {:2} ", abbreviated_month_name(tm.mon).unwrap_or("unk"), tm.mday).as_str());
+            s.push_str(format!("{} {:2} ", abbreviated_month_name(tm.mon).unwrap_or("Unk"), tm.mday).as_str());
             let diff = (current_tm.year - tm.year) * 12 + current_tm.mon - tm.mon;
             if  diff > 6 || diff < -6 {
                 s.push_str(format!("{:5}", tm.year + 1900).as_str());
