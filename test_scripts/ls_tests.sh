@@ -1126,6 +1126,73 @@ start_test ls "ls prints list of files for numeric and long format"
     assert_file_size 13 0 ../test_tmp/stderr.txt
 end_test
 
+start_test ls "ls prints list of files control character option"
+    echo .config > .config
+    chmod 644 .config
+    echo aaa > aaa
+    chmod 644 aaa
+    echo asdfghjkl > asdfghjkl
+    chmod 644 asdfghjkl
+    ln -s aaa bbb
+    mkfifo -m 600 ccc
+    echo qwertyuiop > qwertyuiop
+    chmod 644 qwertyuiop
+    mkdir -m 755 test1
+    mkdir -m 755 test2
+    echo xxx > xxx
+    chmod 644 xxx
+    echo yyy > yyy
+    chmod 755 yyy
+    "../$RSUBOX" ls -q > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_line_count 2 9 ../test_tmp/stdout.txt &&
+    assert_file_line 3 1 aaa ../test_tmp/stdout.txt &&
+    assert_file_line 4 2 asdfghjkl ../test_tmp/stdout.txt &&
+    assert_file_line 5 3 bbb ../test_tmp/stdout.txt &&
+    assert_file_line 6 4 ccc ../test_tmp/stdout.txt &&
+    assert_file_line 7 5 qwertyuiop ../test_tmp/stdout.txt &&
+    assert_file_line 8 6 test1 ../test_tmp/stdout.txt &&
+    assert_file_line 9 7 test2 ../test_tmp/stdout.txt &&
+    assert_file_line 10 8 xxx ../test_tmp/stdout.txt &&
+    assert_file_line 11 9 yyy ../test_tmp/stdout.txt &&
+    assert_file_size 12 0 ../test_tmp/stderr.txt
+end_test
+
+start_test ls "ls prints list of files for control character option and long format"
+    echo .config > .config
+    chmod 644 .config
+    echo aaa > aaa
+    chmod 644 aaa
+    echo asdfghjkl > asdfghjkl
+    chmod 644 asdfghjkl
+    ln -s aaa bbb
+    mkfifo -m 600 ccc
+    echo qwertyuiop > qwertyuiop
+    chmod 644 qwertyuiop
+    mkdir -m 755 test1
+    mkdir -m 755 test2
+    echo xxx > xxx
+    chmod 644 xxx
+    echo yyy > yyy
+    chmod 755 yyy
+    "../$RSUBOX" ls -lq > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_line_count 2 10 ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 3 1 '^total [0-9][0-9]*' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 4 2 '^-rw-r--r--  *1  *'"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *aaa' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 5 3 '^-rw-r--r--  *1  *'"`id -un` `id -gn`"'  *10 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *asdfghjkl' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 6 4 '^l.........  *[0-9][0-9]*  *'"`id -un` `id -gn`"'  *[0-9][0-9]* [A-Z][a-z][a-z] [0-9 ][0-9] [0-9:\][0-9\:]*  *bbb -> aaa' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 7 5 '^prw-------  *1  *'"`id -un` `id -gn`"'  *[0-9][0-9]* [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *ccc' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 8 6 '^-rw-r--r--  *1  *'"`id -un` `id -gn`"'  *11 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *qwertyuiop' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 9 7 '^drwxr-xr-x  *[0-9][0-9]*  *'"`id -un` `id -gn`"'  *[0-9][0-9]* [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *test1' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 10 8 '^drwxr-xr-x  *[0-9][0-9]*  *'"`id -un` `id -gn`"'  *[0-9][0-9]* [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *test2' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 11 9 '^-rw-r--r--  *1  *'"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *xxx' ../test_tmp/stdout.txt &&
+    assert_file_line_pattern 12 10 '^-rwxr-xr-x  *1  *'"`id -un` `id -gn`"'  *4 [A-Z][a-z][a-z] [0-9 ][0-9] [0-9: ][0-9:]*  *yyy' ../test_tmp/stdout.txt &&
+    assert_file_size 13 0 ../test_tmp/stderr.txt
+end_test
+
 start_test ls "ls prints list of files for reverse option"
     echo .config > .config
     chmod 644 .config
