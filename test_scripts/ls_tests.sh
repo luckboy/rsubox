@@ -781,7 +781,7 @@ start_test ls "ls prints list of files for indicator option"
     assert_file_size 12 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls prints list of files for directory indicator option and long format"
+start_test ls "ls prints list of files for indicator option and long format"
     echo .config > .config
     chmod 644 .config
     echo aaa > aaa
@@ -848,7 +848,7 @@ start_test ls "ls prints list of files for directory indicator option"
     assert_file_size 12 0 ../test_tmp/stderr.txt
 end_test
 
-start_test ls "ls prints list of files for indicator option and long format"
+start_test ls "ls prints list of files for directory indicator option and long format"
     echo .config > .config
     chmod 644 .config
     echo aaa > aaa
