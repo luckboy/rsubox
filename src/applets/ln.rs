@@ -32,7 +32,8 @@ fn ln_file<P: AsRef<Path>, Q: AsRef<Path>>(src_path: P, dst_path: Q, opts: &Opti
 {
     let mut is_success = if opts.force_flag {
         match remove_file(dst_path.as_ref()) {
-            Ok(())   => true,
+            Ok(()) => true,
+            Err(err) if err.kind() == ErrorKind::NotFound => true,
             Err(err) => {
                 eprintln!("{}: {}", dst_path.as_ref().to_string_lossy(), err);
                 false

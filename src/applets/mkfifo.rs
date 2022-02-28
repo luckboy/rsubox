@@ -44,7 +44,7 @@ fn mkfifo_file<P: AsRef<Path>>(path: P, opts: &Options) -> bool
 
 pub fn main(args: &[String]) -> i32
 {
-    let mut opt_parser = getopt::Parser::new(args, "m");
+    let mut opt_parser = getopt::Parser::new(args, "m:");
     let mut opts = Options {
         mode: None,
     };
