@@ -200,6 +200,54 @@ impl<R: BufRead> BufRead for CharByteReader<R>
 impl<R: BufRead> CharByteRead for CharByteReader<R>
 {}
 
+pub trait ByteRead: BufRead
+{
+    fn read_byte(&mut self, b: &mut u8) -> Result<bool>
+    {
+        let mut byte_buf: [u8; 1] = [0];
+        loop {
+            match self.read(&mut byte_buf) {
+                Ok(0) => return Ok(false),
+                Ok(_) => {
+                    *b = byte_buf[0];
+                    return Ok(true)
+                },
+                Err(err) if err.kind() == ErrorKind::Interrupted => (),
+                Err(err) => return Err(err),
+            }
+        }
+    }
+}
+
+pub struct ByteReader<R: BufRead>
+{
+    reader: R,
+}
+
+impl<R: BufRead> ByteReader<R>
+{
+    pub fn new(reader: R) -> ByteReader<R>
+    { ByteReader { reader, } }
+}
+
+impl<R: BufRead> Read for ByteReader<R>
+{
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize>
+    { self.reader.read(buf) }
+}
+
+impl<R: BufRead> BufRead for ByteReader<R>
+{
+    fn fill_buf(&mut self) -> Result<&[u8]>
+    { self.reader.fill_buf() }
+    
+    fn consume(&mut self, amt: usize)
+    { self.reader.consume(amt); }
+}
+
+impl<R: BufRead> ByteRead for ByteReader<R>
+{}
+
 pub struct Regex
 {
     libc_regex: libc::regex_t,
