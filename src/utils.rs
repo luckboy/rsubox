@@ -690,6 +690,18 @@ pub fn copy_stream<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Pat
             }
         }
     }
+    if is_success {
+        match w.flush() {
+            Ok(())   => (),
+            Err(err) => {
+                match out_path {
+                    Some(out_path) => eprintln!("{}: {}", out_path.to_string_lossy(), err),
+                    None           => eprintln!("{}", err),
+               }
+               is_success = false;
+            },
+        }
+    }
     is_success
 }
 
