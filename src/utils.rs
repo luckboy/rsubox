@@ -1489,3 +1489,12 @@ pub fn ask_for_path<P: AsRef<Path>>(s: &str, path: P) -> bool
         }
     }
 }
+
+pub fn str_without_newline_on_end(s: &str) -> &str
+{
+    if s.ends_with('\n') {
+        &s[0..(s.len() - 1)]
+    } else {
+        s
+    }
+}
