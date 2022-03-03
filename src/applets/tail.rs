@@ -237,7 +237,7 @@ fn tail_file<P: AsRef<Path>>(path: P, opts: &Options, are_many_files: bool, is_f
 fn parse_number(s: &String) -> Option<Number>
 {
     if s.starts_with('+') {
-        match s[1..].parse::<u64>() {
+        match (&s[1..]).parse::<u64>() {
             Ok(n)    => Some(Number::Plus(n)),
             Err(err) => {
                 eprintln!("{}", err);
@@ -245,7 +245,7 @@ fn parse_number(s: &String) -> Option<Number>
             },
         }
     } else if s.starts_with('-') {
-        match s[1..].parse::<u64>() {
+        match (&s[1..]).parse::<u64>() {
             Ok(n)    => Some(Number::Minus(n)),
             Err(err) => {
                 eprintln!("{}", err);
