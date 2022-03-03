@@ -369,6 +369,7 @@ fn parse_list(s: &String, list: &mut List) -> bool
     list.start = None;
     list.elems.clear();
     list.end = None;
+    let mut new_elems: Vec<usize> = Vec::new();
     for t in s.split(',') {
         match t.split_once("-") {
             Some(("", "")) => {
@@ -415,7 +416,7 @@ fn parse_list(s: &String, list: &mut List) -> bool
                             },
                             Ok(high) => {
                                 for i in (low - 1)..high {
-                                    list.elems.push(i);
+                                    new_elems.push(i);
                                 }
                             },
                             Err(err) => {
@@ -436,7 +437,7 @@ fn parse_list(s: &String, list: &mut List) -> bool
                         eprintln!("Element is zero");
                         return false;
                     }
-                    Ok(elem) => list.elems.push(elem - 1),
+                    Ok(elem) => new_elems.push(elem - 1),
                     Err(err) => {
                         eprintln!("{}", err);
                         return false;
@@ -445,10 +446,9 @@ fn parse_list(s: &String, list: &mut List) -> bool
             },
         }
     }
-    let new_elems: Vec<usize> = list.elems.iter().filter(|e| {
-            list.start.map(|n| **e > n).unwrap_or(true) && list.end.map(|n| **e < n).unwrap_or(true)
-    }).map(|e| *e).collect();
-    list.elems = new_elems.clone();
+    list.elems = new_elems.into_iter().filter(|e| {
+            list.start.map(|n| *e > n).unwrap_or(true) && list.end.map(|n| *e < n).unwrap_or(true)
+    }).collect();
     list.elems.sort();
     list.elems.dedup();
     true
