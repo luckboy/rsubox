@@ -44,7 +44,7 @@ fn paste_line<R: Read>(stream: &mut Stream<R>, lines: &mut Vec<String>) -> bool
                 stream.has_eof = true;
             },
             Ok(_) => {
-                let line_without_newline = str_without_newline_on_end(line.as_str());
+                let line_without_newline = str_without_newline(line.as_str());
                 lines.push(String::from(line_without_newline));
             },
             Err(err) => {
@@ -171,7 +171,7 @@ fn paste_serial<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
                     i += 1;
                     if i >= opts.delimiters.len() { i = 0; }
                 }
-                let line_without_newline = str_without_newline_on_end(line.as_str());
+                let line_without_newline = str_without_newline(line.as_str());
                 match write!(w, "{}", line_without_newline) {
                     Ok(())   => (),
                     Err(err) => {

@@ -54,7 +54,7 @@ fn cut_bytes<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
         match r.read_line(&mut line) {
             Ok(0) => break,
             Ok(_) => {
-                let line_without_newline = str_without_newline_on_end(line.as_str());
+                let line_without_newline = str_without_newline(line.as_str());
                 let bytes: Vec<u8> = line_without_newline.bytes().collect();
                 match opts.list.start {
                     Some(high) => {
@@ -139,7 +139,7 @@ fn cut_chars<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
         match r.read_line(&mut line) {
             Ok(0) => break,
             Ok(_) => {
-                let line_without_newline = str_without_newline_on_end(line.as_str());
+                let line_without_newline = str_without_newline(line.as_str());
                 let chars: Vec<char> = line_without_newline.chars().collect();
                 match opts.list.start {
                     Some(high) => {
@@ -221,7 +221,7 @@ fn cut_fields<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
         match r.read_line(&mut line) {
             Ok(0) => break,
             Ok(_) => {
-                let line_without_newline = str_without_newline_on_end(line.as_str());
+                let line_without_newline = str_without_newline(line.as_str());
                 let fields: Vec<&str> = line_without_newline.split(opts.delimiter).collect();
                 if fields.len() > 1 {
                     let mut is_first = true;
