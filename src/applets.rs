@@ -37,6 +37,7 @@ pub mod ls;
 pub mod mkdir;
 pub mod mkfifo;
 pub mod mv;
+pub mod paste;
 pub mod printf;
 pub mod rm;
 pub mod rmdir;
@@ -71,6 +72,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("mkdir"), mkdir::main);
     applet_funs.insert(String::from("mkfifo"), mkfifo::main);
     applet_funs.insert(String::from("mv"), mv::main);
+    applet_funs.insert(String::from("paste"), paste::main);
     applet_funs.insert(String::from("printf"), printf::main);
     applet_funs.insert(String::from("rm"), rm::main);
     applet_funs.insert(String::from("rmdir"), rmdir::main);
