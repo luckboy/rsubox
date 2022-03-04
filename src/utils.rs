@@ -599,7 +599,6 @@ pub fn escape_for_printf(chars: &mut PushbackIter<Chars>) -> String
     match chars.next() {
         Some('a')  => String::from("\x07"),
         Some('b')  => String::from("\x08"),
-        Some('c')  => String::new(),
         Some('f')  => String::from("\x0c"),
         Some('n')  => String::from("\n"),
         Some('r')  => String::from("\r"),
