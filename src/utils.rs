@@ -687,7 +687,7 @@ pub fn copy_stream<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Pat
                 }
                 is_success = false;
                 break;
-            }
+            },
         }
     }
     if is_success {
