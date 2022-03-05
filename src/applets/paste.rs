@@ -225,12 +225,12 @@ fn paste_serial_file(path: &String, opts: &Options) -> bool
 
 fn parse_delimiters(s: &String, delimiters: &mut Vec<char>)
 {
-    let mut iter = s.chars();
+    let mut chars = s.chars();
     delimiters.clear();
     loop {
-        match iter.next() {
+        match chars.next() {
             Some('\\') => {
-                match iter.next() {
+                match chars.next() {
                     Some('n')  => delimiters.push('\n'),
                     Some('t')  => delimiters.push('\t'),
                     Some('\\') => delimiters.push('\\'),

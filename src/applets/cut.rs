@@ -456,10 +456,10 @@ fn parse_list(s: &String, list: &mut List) -> bool
 
 fn parse_delimiter(s: &String) -> Option<char>
 {
-    let mut iter = s.chars();
-    match iter.next() {
+    let mut chars = s.chars();
+    match chars.next() {
         Some(c) => {
-            match iter.next()  {
+            match chars.next()  {
                 Some(_) => {
                     eprintln!("Delimiter isn't single character");
                     return None;
