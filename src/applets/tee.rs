@@ -96,7 +96,7 @@ fn tee_files(path_bufs: &[PathBuf], opts: &Options) -> bool
     true
 }
 
-fn set_ignored_interrupt()
+fn set_interrupt_ignoring()
 { unsafe { libc::signal(libc::SIGINT, libc::SIG_IGN); } }
 
 pub fn main(args: &[String]) -> i32
@@ -122,7 +122,7 @@ pub fn main(args: &[String]) -> i32
         }
     }
     if opts.ignored_interrupt_flag {
-        set_ignored_interrupt();
+        set_interrupt_ignoring();
     }
     let paths: Vec<PathBuf> = args.iter().skip(opt_parser.index()).map(|a| PathBuf::from(a)).collect();
     if tee_files(&paths, &opts) { 0 } else { 1 }
