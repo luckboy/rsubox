@@ -48,6 +48,15 @@ start_test cat "cat concatenates two files"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test cat "cat concatenates file and data from stdin"
+    cat ../test_fixtures/test.txt ../test_fixtures/test_utf8.txt > ../test_tmp/expected.txt
+    cat ../test_fixtures/test_utf8.txt | "../$RSUBOX" cat ../test_fixtures/test.txt - > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test cat "cat concatenates two files with -u option"
     cat ../test_fixtures/test.txt ../test_fixtures/test_utf8.txt > ../test_tmp/expected.txt
     "../$RSUBOX" cat -u ../test_fixtures/test.txt ../test_fixtures/test_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
