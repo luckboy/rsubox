@@ -24,13 +24,17 @@ use crate::utils::*;
 fn cat<R: Read>(r: &mut R, path: Option<&Path>) -> bool
 { copy_stream(r, &mut stdout(), path, None) }
 
-fn cat_file<P: AsRef<Path>>(path: P) -> bool
+fn cat_file(path: &String) -> bool
 {
-    match File::open(path.as_ref()) {
-        Ok(mut file) => cat(&mut file, Some(path.as_ref())),
-        Err(err)     => {
-            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
-            false
+    if path == &String::from("-") {
+        cat(&mut stdin(), None)
+    } else {
+        match File::open(path) {
+            Ok(mut file) => cat(&mut file, Some(path.as_ref())),
+            Err(err)     => {
+                eprintln!("{}: {}", path, err);
+                false
+            }
         }
     }
 }

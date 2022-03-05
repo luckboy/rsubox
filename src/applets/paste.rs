@@ -212,11 +212,10 @@ fn paste_serial_file(path: &String, opts: &Options) -> bool
     if path == &String::from("-") {
         paste_serial(&mut stdin(), None, opts)
     } else {
-        let path_buf = PathBuf::from(path);
-        match File::open(path_buf.as_path()) {
-            Ok(mut file) => paste_serial(&mut file, Some(path_buf.as_path()), opts),
+        match File::open(path) {
+            Ok(mut file) => paste_serial(&mut file, Some(path.as_ref()), opts),
             Err(err)     => {
-                eprintln!("{}: {}", path_buf.as_path().to_string_lossy(), err);
+                eprintln!("{}: {}", path, err);
                 false
             }
         }

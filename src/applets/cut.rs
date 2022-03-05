@@ -353,13 +353,17 @@ fn cut<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
     }
 }
 
-fn cut_file<P: AsRef<Path>>(path: P, opts: &Options) -> bool
+fn cut_file(path: &String, opts: &Options) -> bool
 {
-    match File::open(path.as_ref()) {
-        Ok(mut file) => cut(&mut file, Some(path.as_ref()), opts),
-        Err(err)     => {
-            eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
-            false
+    if path == &String::from("-") {
+        cut(&mut stdin(), None, opts)
+    } else {
+        match File::open(path) {
+            Ok(mut file) => cut(&mut file, Some(path.as_ref()), opts),
+            Err(err)     => {
+                eprintln!("{}: {}", path, err);
+                false
+            }
         }
     }
 }
