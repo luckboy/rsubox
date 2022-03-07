@@ -197,24 +197,24 @@ pub fn main(args: &[String]) -> i32
             Some(Ok(Opt('l', _))) => {
                 if opts.verbose_flag == VerboseFlag::Silent {
                     eprintln!("Incompatible options");
-                    return 1
+                    return 2;
                 }
                 opts.verbose_flag = VerboseFlag::Verbose;
             },
             Some(Ok(Opt('s', _))) => {
                 if opts.verbose_flag == VerboseFlag::Verbose {
                     eprintln!("Incompatible options");
-                    return 1
+                    return 2;
                 }
                 opts.verbose_flag = VerboseFlag::Silent;
             },
             Some(Ok(Opt(c, _))) => {
                 eprintln!("unknown option -- {:?}", c);
-                return 1;
+                return 2;
             },
             Some(Err(err)) => {
                 eprintln!("{}", err);
-                return 1;
+                return 2;
             },
             None => break,
         }
