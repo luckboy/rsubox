@@ -214,7 +214,7 @@ fn get_string_for_key<'a>(s: &'a str, fields: &[&'a str], key: &Key) -> &'a str
         Some(field) => {
             let i = field.as_ptr() as usize - s.as_ptr() as usize;
             match key.field_start.char_pos {
-                Some(char_pos) => i + char_pos,
+                Some(char_pos) => i.saturating_add(char_pos),
                 None           => i,
             }
         },
@@ -226,8 +226,8 @@ fn get_string_for_key<'a>(s: &'a str, fields: &[&'a str], key: &Key) -> &'a str
                 Some(field) => {
                     let i = field.as_ptr() as usize - s.as_ptr() as usize;
                     match field_end.char_pos {
-                        Some(char_pos) => i + char_pos + 1,
-                        None           => i + field.len(),
+                        Some(char_pos) => i.saturating_add(char_pos + 1),
+                        None           => i.saturating_add(field.len()),
                     }
                 },
                 None => s.len(),
