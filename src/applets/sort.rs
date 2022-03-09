@@ -178,7 +178,7 @@ fn get_string_for_order_opts(s: &str, order_opts: &OrderOptions) -> String
         String::from(s)
     };
     let new_s = if order_opts.i_flag {
-        new_s.replace(|c: char| { c != ' ' && c.is_control() }, "")
+        new_s.replace(char::is_control, "")
     } else {
         new_s
     };
