@@ -630,6 +630,42 @@ pub fn escape_for_printf(chars: &mut PushbackIter<Chars>) -> String
     }
 }
 
+pub fn escape_for_tr(chars: &mut PushbackIter<Chars>) -> char
+{
+    match chars.next() {
+        Some('a')  => '\x07',
+        Some('b')  => '\x08',
+        Some('f')  => '\x0c',
+        Some('n')  => '\n',
+        Some('r')  => '\r',
+        Some('t')  => '\t',
+        Some('v')  => '\x0b',
+        Some('\\') => '\\',
+        Some(c @ ('0'..='7'))  => {
+            let mut digits = String::new();
+            digits.push(c);
+            for _ in 0..2 {
+                match chars.next() {
+                    Some(c @ ('0'..='7')) => {
+                        digits.push(c);
+                    }
+                    Some(c) => {
+                        chars.undo(c);
+                        break;
+                    },
+                    None => (),
+                }
+            }
+            match char::from_u32(u32::from_str_radix(digits.as_str(), 8).unwrap()) {
+                Some(c) => c,
+                None    => char::REPLACEMENT_CHARACTER,
+            }
+        },
+        Some(c)    => c,
+        None       => '\0',
+    }
+}
+
 pub fn dir_name_and_base_name(path: &str, suffix: Option<&str>) -> (String, String)
 {
     let (dir_name, base_name) = match path.trim_end_matches(path::MAIN_SEPARATOR).rsplit_once(path::MAIN_SEPARATOR) {

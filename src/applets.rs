@@ -45,6 +45,7 @@ pub mod sort;
 pub mod tail;
 pub mod tee;
 pub mod test;
+pub mod tr;
 pub mod r#true;
 pub mod unlink;
 pub mod wc;
@@ -82,6 +83,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("tail"), tail::main);
     applet_funs.insert(String::from("tee"), tee::main);
     applet_funs.insert(String::from("test"), test::main);
+    applet_funs.insert(String::from("tr"), tr::main);
     applet_funs.insert(String::from("true"), r#true::main);
     applet_funs.insert(String::from("unlink"), unlink::main);
     applet_funs.insert(String::from("wc"), wc::main);
