@@ -74,20 +74,20 @@ fn fold<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options) -> bool
                             break;
                         }
                         if opts.space_flag {
-                            let bytes: Vec<u8> = line.bytes().collect();
-                            let j = (0..bytes.len()).rev().find(|i| {
+                            let bytes = line.as_bytes();
+                            let i = (0..bytes.len()).rev().find(|i| {
                                 bytes[*i] == b' ' || bytes[*i] == b'\t'
                             });
-                            match j {
-                                Some(j) => {
-                                    match write!(w, "{}\n", &line[0..(j + 1)]) {
+                            match i {
+                                Some(i) => {
+                                    match write!(w, "{}\n", &line[0..(i + 1)]) {
                                         Ok(()) => (),
                                         Err(err) => {
                                             eprintln!("{}", err);
                                             return false;
                                         },
                                     }
-                                    line = String::from(&line[(j + 1)..]);
+                                    line = String::from(&line[(i + 1)..]);
                                     column = 0;
                                     for c in line.chars() {
                                         column = adjust_column(column, c, opts);
