@@ -36,11 +36,11 @@ fn adjust_column(column: usize, c: char, opts: &Options) -> usize
                 if column >= 1 { column - 1 } else { 0 }
             },
             '\r'   => 0,
-            '\t'   => column + 8 + (column % 8),
-            _      => column + 1,
+            '\t'   => column.saturating_add(8 - (column % 8)),
+            _      => column.saturating_add(1),
         }
     } else {
-        column + c.len_utf8()
+        column.saturating_add(c.len_utf8())
     }
 }
 
