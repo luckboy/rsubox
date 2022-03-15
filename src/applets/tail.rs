@@ -49,7 +49,7 @@ fn tail_bytes_from_start<R: Read>(r: &mut R, path: Option<&Path>, n: u64) -> boo
         match r.read_byte(&mut b) {
             Ok(false) => break,
             Ok(_) => {
-                if i >= n {
+                if i + 1 >= n {
                     let buf: [u8; 1] = [b];
                     match w.write_all(&buf) {
                         Ok(())   => (),
@@ -132,7 +132,7 @@ fn tail_lines_from_start<R: Read>(r: &mut R, path: Option<&Path>, n: u64) -> boo
         match r.read_char(&mut c) {
             Ok(0) => break,
             Ok(_) => {
-                if i >= n {
+                if i + 1 >= n {
                     match write!(w, "{}", c) {
                         Ok(())   => (),
                         Err(err) => {
