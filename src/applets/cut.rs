@@ -455,8 +455,8 @@ fn parse_list(s: &String, list: &mut List) -> bool
             },
         }
     }
-    if list.start.map(|n| { list.end.map(|m| n > m).unwrap_or(false) }).unwrap_or(false) {
-        list.end = list.start;
+    if list.start.map(|n| { list.end.map(|m| n >= m).unwrap_or(false) }).unwrap_or(false) {
+        list.end = list.start.map(|n| n + 1);
     }
     list.elems = new_elems.into_iter().filter(|e| {
             list.start.map(|n| *e > n).unwrap_or(true) && list.end.map(|n| *e < n).unwrap_or(true)
