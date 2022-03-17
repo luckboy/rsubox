@@ -36,7 +36,9 @@ start_test_suites
 . ./test_scripts/chgrp_tests.sh
 . ./test_scripts/chmod_tests.sh
 . ./test_scripts/chown_tests.sh
+. ./test_scripts/cmp_tests.sh
 . ./test_scripts/cp_tests.sh
+. ./test_scripts/cut_tests.sh
 . ./test_scripts/dd_tests.sh
 . ./test_scripts/dirname_tests.sh
 . ./test_scripts/echo_tests.sh
@@ -49,10 +51,12 @@ start_test_suites
 . ./test_scripts/mkdir_tests.sh
 . ./test_scripts/mkfifo_tests.sh
 . ./test_scripts/mv_tests.sh
+. ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/rm_tests.sh
 . ./test_scripts/rmdir_tests.sh
 . ./test_scripts/tail_tests.sh
+. ./test_scripts/tee_tests.sh
 . ./test_scripts/test_tests.sh
 . ./test_scripts/true_tests.sh
 . ./test_scripts/unlink_tests.sh

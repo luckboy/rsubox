@@ -1,0 +1,4 @@
+Second file contains random words which separated by tab:
+
+digital	lazy	response	proof	attract	lease
+linear	push	bargain	intermediate	session	term	ground	rape
