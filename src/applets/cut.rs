@@ -377,7 +377,7 @@ fn parse_list(s: &String, list: &mut List) -> bool
     for t in s.split(',') {
         match t.split_once("-") {
             Some(("", "")) => {
-                eprintln!("Invalid list");
+                eprintln!("Invalid range");
                 return false;
             },
             Some((low_s, "")) => {
@@ -419,8 +419,13 @@ fn parse_list(s: &String, list: &mut List) -> bool
                                 return false;
                             },
                             Ok(high) => {
-                                for i in (low - 1)..high {
-                                    new_elems.push(i);
+                                if low <= high {
+                                    for i in (low - 1)..high {
+                                        new_elems.push(i);
+                                    }
+                                } else {
+                                    eprintln!("Invalid range");
+                                    return false;
                                 }
                             },
                             Err(err) => {
