@@ -66,6 +66,23 @@ start_test cut "cut writes cutted file for second unsorted fields"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test cut "cut writes cutted file for third unsorted fields"
+    "../$RSUBOX" cut -f 5,6,-2,-3,10-,8- ../test_fixtures/test_cut_tab.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_fixtures/test_cut_tab_fields.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
+start_test cut "cut writes cutted data from stdin for two imposed ranges"
+    printf 'abcdef\tghijkl\tmnopqr\n' > ../test_tmp/expected.txt
+    (printf 'abcdef\tghijkl\tmnopqr\n') | "../$RSUBOX" cut -f -2,1- > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test cut "cut writes cutted file for bytes"
     "../$RSUBOX" cut -b -20,40-60,80-90,100- ../test_fixtures/test_cut_space.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 

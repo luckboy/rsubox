@@ -181,6 +181,30 @@ start_test cmp "cmp compares stdin and stdin"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test cmp "cmp complains on too few arguments"
+    "../$RSUBOX" cmp > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 2 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Too few arguments' ../test_tmp/stderr.txt
+end_test
+
+start_test cmp "cmp complains on too few arguments for one file"
+    "../$RSUBOX" cmp xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 2 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Too few arguments' ../test_tmp/stderr.txt
+end_test
+
+start_test cmp "cmp complains on too many arguments"
+    "../$RSUBOX" cmp xxx yyy zzz > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 2 = "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Too many arguments' ../test_tmp/stderr.txt
+end_test
+
 start_test cmp "cmp complains on incompatible options"
     "../$RSUBOX" cmp -ls xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 

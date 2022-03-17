@@ -138,6 +138,14 @@ start_test paste "paste pastes files with data from stdin for serial"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test paste "paste complains on too few arguments"
+    "../$RSUBOX" paste > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Too few arguments' ../test_tmp/stderr.txt
+end_test
+
 start_test paste "paste complains on non-existent file"
     "../$RSUBOX" paste xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
