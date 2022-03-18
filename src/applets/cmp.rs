@@ -39,8 +39,8 @@ fn cmp<R: Read, S: Read>(r1: &mut R, r2: &mut S, path1: Option<&Path>, path2: Op
     let mut r1 = ByteReader::new(BufReader::new(r1));
     let mut r2 = ByteReader::new(BufReader::new(r2));
     let mut res = Some(true);
-    let mut byte_count: u64 = 1;
-    let mut line_count: u64 = 1;
+    let mut i: u64 = 0;
+    let mut j: u64 = 0;
     loop {
         let mut b1: u8 = 0;
         let mut b2: u8 = 0;
@@ -82,12 +82,12 @@ fn cmp<R: Read, S: Read>(r1: &mut R, r2: &mut S, path1: Option<&Path>, path2: Op
                                 VerboseFlag::None => {
                                     let path1 = path1.map(|p| p.to_string_lossy().into_owned()).unwrap_or(String::from("-"));
                                     let path2 = path2.map(|p| p.to_string_lossy().into_owned()).unwrap_or(String::from("-"));
-                                    println!("{} {} differ: char {}, line {}", path1, path2, byte_count, line_count);
+                                    println!("{} {} differ: char {}, line {}", path1, path2, i + 1, j + 1);
                                     res = Some(false);
                                     break;
                                 },
                                 VerboseFlag::Verbose => {
-                                    println!("{} {:o} {:o}", byte_count, b1, b2);
+                                    println!("{} {:o} {:o}", i + 1, b1, b2);
                                     res = Some(false);
                                 },
                                 VerboseFlag::Silent => {
@@ -96,8 +96,8 @@ fn cmp<R: Read, S: Read>(r1: &mut R, r2: &mut S, path1: Option<&Path>, path2: Op
                                 },
                             }
                         }
-                        byte_count += 1;
-                        if b1 == b'\n' { line_count += 1; }
+                        i += 1;
+                        if b1 == b'\n' { j += 1; }
                     },
                     Err(err) => {
                         if opts.verbose_flag != VerboseFlag::Silent {
