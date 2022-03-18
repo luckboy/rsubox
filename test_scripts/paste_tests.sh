@@ -103,20 +103,18 @@ start_test paste "paste pastes files for delimiters and serial"
 end_test
 
 start_test paste "paste pastes file and file with UTF-8 codes"
-    paste -d '\t' ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste1_utf8.txt > ../test_tmp/expected.txt
     "../$RSUBOX" paste ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste1_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
-    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_compare_files 2 ../test_fixtures/test_paste_pasted_utf8.txt ../test_tmp/stdout.txt &&
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
 start_test paste "paste pastes file and file with UTF-8 codes for serial"
-    paste -d '\t' -s ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste1_utf8.txt > ../test_tmp/expected.txt
     "../$RSUBOX" paste -s ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste1_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
-    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_compare_files 2 ../test_fixtures/test_paste_pasted_s_utf8.txt ../test_tmp/stdout.txt &&
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 

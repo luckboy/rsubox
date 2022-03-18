@@ -1,0 +1,12 @@
+First pasting file contains random words:	Pierwszy plik wklejania zawiera słowa:
+	
+triangle	trójkąt
+clean	czysty
+explosion	eksplozja
+examination	badanie
+anger	gniew
+economics	Ekonomia
+snake	wąż
+partnership	Współpraca
+division	podział
+ensure	zapewnić
