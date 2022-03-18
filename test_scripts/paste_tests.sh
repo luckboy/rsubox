@@ -48,7 +48,7 @@ start_test paste "paste pastes big files for delimiters"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
-start_test paste "paste pastes big files for delimiters with zero character"
+start_test paste "paste pastes big files for delimiters with null character"
     paste -d '1\0' ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste2.txt ../test_fixtures/test_paste3.txt ../test_fixtures/test_paste4.txt > ../test_tmp/expected.txt
     "../$RSUBOX" paste -d '1\0' ../test_fixtures/test_paste1.txt ../test_fixtures/test_paste2.txt ../test_fixtures/test_paste3.txt ../test_fixtures/test_paste4.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
