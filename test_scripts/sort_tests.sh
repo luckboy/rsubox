@@ -724,7 +724,7 @@ start_test sort "sort complains on too many arguments for checking"
     echo xxx > xxx
     "../$RSUBOX" sort -c xxx yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Too many arguments' ../test_tmp/stderr.txt
 end_test
@@ -733,7 +733,7 @@ start_test sort "sort complains on first field position that is zero"
     echo xxx > xxx
     "../$RSUBOX" sort -k 0 xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Field position is zero' ../test_tmp/stderr.txt
 end_test
@@ -742,7 +742,7 @@ start_test sort "sort complains on second field position that is zero"
     echo xxx > xxx
     "../$RSUBOX" sort -k 1,0 xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Field position is zero' ../test_tmp/stderr.txt
 end_test
@@ -751,7 +751,7 @@ start_test sort "sort complains on first character position that is zero"
     echo xxx > xxx
     "../$RSUBOX" sort -k 1.0 xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Character position is zero' ../test_tmp/stderr.txt
 end_test
@@ -760,7 +760,7 @@ start_test sort "sort complains on first field position that is invalid number"
     echo xxx > xxx
     "../$RSUBOX" sort -k '@#$' xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -769,7 +769,7 @@ start_test sort "sort complains on second field position that is invalid number"
     echo xxx > xxx
     "../$RSUBOX" sort -k '1,@#$' xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -778,7 +778,7 @@ start_test sort "sort complains on first character position that is invalid numb
     echo xxx > xxx
     "../$RSUBOX" sort -k '1.@#$' xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -787,7 +787,7 @@ start_test sort "sort complains on second character position that is invalid num
     echo xxx > xxx
     "../$RSUBOX" sort -k '1,2.@#$' xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -796,7 +796,7 @@ start_test sort "sort complains on invalid first type"
     echo xxx > xxx
     "../$RSUBOX" sort -k 1x xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Invalid type' ../test_tmp/stderr.txt
 end_test
@@ -805,7 +805,7 @@ start_test sort "sort complains on invalid second type"
     echo xxx > xxx
     "../$RSUBOX" sort -k 1,2x xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Invalid type' ../test_tmp/stderr.txt
 end_test
@@ -814,7 +814,7 @@ start_test sort "sort complains on separator that isn't single character"
     echo xxx > xxx
     "../$RSUBOX" sort -k 1,2 -t xy xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Separator isn'"'"'t single character' ../test_tmp/stderr.txt
 end_test
@@ -822,7 +822,7 @@ end_test
 start_test sort "sort complains on non-existent file for sorting"
     "../$RSUBOX" sort xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
 end_test
@@ -830,7 +830,7 @@ end_test
 start_test sort "sort complains on file that doesn't contain valid UTF-8 for sorting"
     "../$RSUBOX" sort  ../test_fixtures/test_sort_invalid_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^\.\./test_fixtures/test_sort_invalid_utf8.txt: stream' ../test_tmp/stderr.txt
 end_test
@@ -838,7 +838,7 @@ end_test
 start_test sort "sort complains on non-existent file for sorting"
     "../$RSUBOX" sort -c xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
 end_test
@@ -846,7 +846,7 @@ end_test
 start_test sort "sort complains on file that doesn't contain valid UTF-8 for checking"
     "../$RSUBOX" sort -c ../test_fixtures/test_sort_invalid_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^\.\./test_fixtures/test_sort_invalid_utf8.txt: stream' ../test_tmp/stderr.txt
 end_test
@@ -854,7 +854,7 @@ end_test
 start_test sort "sort complains on non-existent file for merging"
     "../$RSUBOX" sort -m xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^xxx: ' ../test_tmp/stderr.txt
 end_test
@@ -862,7 +862,7 @@ end_test
 start_test sort "sort complains on file that doesn't contain valid UTF-8 for merging"
     "../$RSUBOX" sort -m ../test_fixtures/test_sort_invalid_utf8.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 2 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^\.\./test_fixtures/test_sort_invalid_utf8.txt: stream' ../test_tmp/stderr.txt
 end_test
