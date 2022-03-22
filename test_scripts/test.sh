@@ -55,6 +55,7 @@ start_test_suites
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/rm_tests.sh
 . ./test_scripts/rmdir_tests.sh
+. ./test_scripts/sort_tests.sh
 . ./test_scripts/tail_tests.sh
 . ./test_scripts/tee_tests.sh
 . ./test_scripts/test_tests.sh
