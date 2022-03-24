@@ -64,7 +64,7 @@ struct Options
 enum Command
 {
     Replace(KeySet, Vec<Element>),
-    ReplaceAndSqueeze(KeySet, Vec<Element>),
+    ReplaceAndSqueeze(KeySet, Vec<Element>, KeySet),
     Squeeze(KeySet),
     Delete(KeySet),
     DeleteAndSqueeze(KeySet, KeySet),
@@ -151,7 +151,7 @@ fn replace_char(set: &[Element], c: char, i: usize, class: Option<CharClass>) ->
     }
 }
 
-fn translate_char(cmd: &Command, c: char, prev_c: Option<char>) -> String
+fn translate_char(cmd: &Command, c: char, prev_c: &mut Option<char>) -> String
 {
     match cmd {
         Command::Replace(key_set, set) => {
@@ -160,26 +160,50 @@ fn translate_char(cmd: &Command, c: char, prev_c: Option<char>) -> String
                 None => format!("{}", c),
             }
         },
-        Command::ReplaceAndSqueeze(key_set, set) => {
-            match find_char(key_set, c) {
-                Some((i, class)) => {
-                    match prev_c {
-                        Some(prev_c) if prev_c == c => String::new(),
-                        _ => replace_char(&set, c, i, class),
+        Command::ReplaceAndSqueeze(key_set1, set, key_set2) => {
+            let s = match find_char(key_set1, c) {
+                Some((i, class)) => replace_char(&set, c, i, class),
+                None             => format!("{}", c),
+            };
+            let mut chars = s.chars();
+            match chars.next() {
+                Some(c2) => {
+                    match chars.next() {
+                        Some(_) => {
+                            *prev_c = None;
+                            s
+                        },
+                        None => {
+                            let s = if contain_char(key_set2, c2) {
+                                match prev_c {
+                                    Some(prev_c) if *prev_c == c2 => String::new(),
+                                    _ => s,
+                                }
+                            } else {
+                                s
+                            };
+                            *prev_c = Some(c2);
+                            s
+                        },
                     }
                 },
-                None             => format!("{}", c),
+                None => {
+                    *prev_c = None;
+                    s
+                },
             }
         },
         Command::Squeeze(key_set) => {
-            if contain_char(key_set, c) {
+            let s = if contain_char(key_set, c) {
                 match prev_c {
-                    Some(prev_c) if prev_c == c => String::new(),
+                    Some(prev_c) if *prev_c == c => String::new(),
                     _ => format!("{}", c),
                 }
             } else {
                 format!("{}", c)
-            }
+            };
+            *prev_c = Some(c);
+            s
         },
         Command::Delete(key_set) => {
             if contain_char(key_set, c) {
@@ -192,14 +216,16 @@ fn translate_char(cmd: &Command, c: char, prev_c: Option<char>) -> String
             if contain_char(key_set1, c) {
                 String::new()
             } else {
-                if contain_char(key_set2, c) {
+                let s = if contain_char(key_set2, c) {
                     match prev_c {
-                        Some(prev_c) if prev_c == c => String::new(),
+                        Some(prev_c) if *prev_c == c => String::new(),
                         _ => format!("{}", c),
                     }
                 } else {
                     format!("{}", c)
-                }
+                };
+                *prev_c = Some(c);
+                s
             }
         },
     }
@@ -215,7 +241,7 @@ fn tr(cmd: &Command) -> bool
         match r.read_char(&mut c) {
             Ok(0) => break,
             Ok(_) => {
-                let s = translate_char(cmd, c, prev_c);
+                let s = translate_char(cmd, c, &mut prev_c);
                 match write!(w, "{}", s) {
                     Ok(())   => (),
                     Err(err) => {
@@ -223,7 +249,6 @@ fn tr(cmd: &Command) -> bool
                         return false;
                     },
                 }
-                prev_c = Some(c);
             },
             Err(err) => {
                 eprintln!("{}", err);
@@ -628,9 +653,10 @@ pub fn main(args: &[String]) -> i32
                             match parse_set(s2, false) {
                                 Some(mut set2) => {
                                     if !match_sets(opts.complement_flag, &set1, &mut set2) { return 1; }
-                                    let mut key_set = set_to_key_set(&set1);
-                                    key_set.is_complement = opts.complement_flag;
-                                    Command::ReplaceAndSqueeze(key_set, set2)
+                                    let mut key_set1 = set_to_key_set(&set1);
+                                    key_set1.is_complement = opts.complement_flag;
+                                    let key_set2 = set_to_key_set(&set2);
+                                    Command::ReplaceAndSqueeze(key_set1, set2, key_set2)
                                 },
                                 None => return 1,
                             }
