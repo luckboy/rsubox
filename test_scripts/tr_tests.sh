@@ -437,6 +437,16 @@ start_test tr "tr replaces characters for print character class"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test tr "tr replaces characters for punct character class"
+    printf '\a\b\f\n\r\t\v !"#$%%&'"'"'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' > test.txt
+    printf '\a\b\f\n\r\t\v xxxxxxxxxxxxxxx0123456789xxxxxxxABCDEFGHIJKLMNOPQRSTUVWXYZxxxxxxabcdefghijklmnopqrstuvwxyzxxxx' > ../test_tmp/expected.txt
+    cat test.txt | "../$RSUBOX" tr '[:punct:]' x > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test tr "tr replaces characters for space character class"
     printf '\a\b\f\n\r\t\v !"#$%%&'"'"'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' > test.txt
     printf '\a\bxxxxxx!"#$%%&'"'"'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~' > ../test_tmp/expected.txt
