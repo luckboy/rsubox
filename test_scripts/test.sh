@@ -44,6 +44,7 @@ start_test_suites
 . ./test_scripts/echo_tests.sh
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
+. ./test_scripts/fold_tests.sh
 . ./test_scripts/head_tests.sh
 . ./test_scripts/link_tests.sh
 . ./test_scripts/ln_tests.sh
