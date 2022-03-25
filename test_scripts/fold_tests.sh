@@ -95,9 +95,11 @@ start_test fold "fold folds lines with special characters"
     printf 'abc\b\b1234567890123456789012345\n' > test.txt
     printf 'abc\r1234567890123456789012345\n' >> test.txt
     printf '\t123456789\t0123456789012345\n' >> test.txt
+    printf 'ab\b\b\b\b1234567890123456789012345\n' >> test.txt
     printf 'abc\b\b1234567890123456789\n012345\n' > ../test_tmp/expected.txt
     printf 'abc\r12345678901234567890\n12345\n' >> ../test_tmp/expected.txt
     printf '\t123456789\n\t012345678901\n2345\n' >> ../test_tmp/expected.txt
+    printf 'ab\b\b\b\b12345678901234567890\n12345\n' >> ../test_tmp/expected.txt
     "../$RSUBOX" fold -w 20 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
@@ -109,9 +111,11 @@ start_test fold "fold folds lines with special characters for byte option"
     printf 'abc\b\b1234567890123456789012345\n' > test.txt
     printf 'abc\r1234567890123456789012345\n' >> test.txt
     printf '\t123456789\t0123456789012345\n' >> test.txt
+    printf 'ab\b\b\b\b1234567890123456789012345\n' >> test.txt
     printf 'abc\b\b123456789012345\n6789012345\n' > ../test_tmp/expected.txt
     printf 'abc\r1234567890123456\n789012345\n' >> ../test_tmp/expected.txt
     printf '\t123456789\t012345678\n9012345\n' >> ../test_tmp/expected.txt
+    printf 'ab\b\b\b\b12345678901234\n56789012345\n' >> ../test_tmp/expected.txt
     "../$RSUBOX" fold -w 20 -b test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
