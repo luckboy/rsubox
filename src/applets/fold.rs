@@ -32,9 +32,7 @@ fn adjust_column(column: usize, c: char, opts: &Options) -> usize
 {
     if !opts.byte_flag {
         match c {
-            '\x08' => {
-                if column >= 1 { column - 1 } else { 0 }
-            },
+            '\x08' => column.saturating_sub(1),
             '\r'   => 0,
             '\t'   => column.saturating_add(8 - (column % 8)),
             _      => column.saturating_add(1),
