@@ -122,7 +122,7 @@ fn str_to_number_str(s: &str) -> &str
     &s[0..(u.as_ptr() as usize - s.as_ptr() as usize)]
 }
 
-fn simply_compare_strs_for_order_opts(s1: &str, s2: &str, order_opts: &OrderOptions) -> Ordering
+fn simply_compare_strs_for_order_options(s1: &str, s2: &str, order_opts: &OrderOptions) -> Ordering
 {
     let res = if order_opts.n_flag {
         let t1 = str_to_number_str(s1);
@@ -162,13 +162,13 @@ fn simply_compare_strs_for_order_opts(s1: &str, s2: &str, order_opts: &OrderOpti
     }
 }
 
-fn simply_compare_strings_for_order_opts(s1: &String, s2: &String, order_opts: &OrderOptions) -> Ordering
-{ simply_compare_strs_for_order_opts(s1.as_str(), s2.as_str(), order_opts) }
+fn simply_compare_strings_for_order_options(s1: &String, s2: &String, order_opts: &OrderOptions) -> Ordering
+{ simply_compare_strs_for_order_options(s1.as_str(), s2.as_str(), order_opts) }
 
 fn simply_compare_strings(s1: &String, s2: &String, opts: &Options) -> Ordering
-{ simply_compare_strings_for_order_opts(s1, s2, &opts.order_options) }
+{ simply_compare_strings_for_order_options(s1, s2, &opts.order_options) }
 
-fn get_string_for_order_opts(s: &str, order_opts: &OrderOptions) -> String
+fn get_string_for_order_options(s: &str, order_opts: &OrderOptions) -> String
 {
     let s = if order_opts.start_b_flag { s.trim_start() } else { s };
     let s = if order_opts.end_b_flag { s.trim_end() } else { s };
@@ -190,15 +190,15 @@ fn get_string_for_order_opts(s: &str, order_opts: &OrderOptions) -> String
     new_s
 }
 
-fn compare_strs_for_order_opts(s1: &str, s2: &str, order_opts: &OrderOptions) -> Ordering
+fn compare_strs_for_order_options(s1: &str, s2: &str, order_opts: &OrderOptions) -> Ordering
 {
-    let new_s1 = get_string_for_order_opts(s1, order_opts);
-    let new_s2 = get_string_for_order_opts(s2, order_opts);
-    simply_compare_strings_for_order_opts(&new_s1, &new_s2, order_opts)
+    let new_s1 = get_string_for_order_options(s1, order_opts);
+    let new_s2 = get_string_for_order_options(s2, order_opts);
+    simply_compare_strings_for_order_options(&new_s1, &new_s2, order_opts)
 }
 
 fn compare_strings(s1: &String, s2: &String, opts: &Options) -> Ordering
-{ compare_strs_for_order_opts(s1.as_str(), s2.as_str(), &opts.order_options) }
+{ compare_strs_for_order_options(s1.as_str(), s2.as_str(), &opts.order_options) }
 
 fn get_fields_from_str<'a>(s: &'a str, opts: &Options) -> Vec<&'a str>
 {
@@ -258,9 +258,9 @@ fn compare_strings_for_keys(s1: &String, s2: &String, opts: &Options) -> Orderin
             &opts.order_options
         };
         if !order_opts.start_b_flag && !order_opts.end_b_flag && !order_opts.d_flag && !order_opts.f_flag && !order_opts.i_flag {
-            res = simply_compare_strs_for_order_opts(u1, u2, order_opts);
+            res = simply_compare_strs_for_order_options(u1, u2, order_opts);
         } else {
-            res = compare_strs_for_order_opts(u1, u2, order_opts);
+            res = compare_strs_for_order_options(u1, u2, order_opts);
         }
         if res != Ordering::Equal {
             break;
