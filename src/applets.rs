@@ -28,6 +28,7 @@ pub mod cut;
 pub mod dd;
 pub mod dirname;
 pub mod echo;
+pub mod env;
 pub mod expr;
 pub mod r#false;
 pub mod fold;
@@ -67,6 +68,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("dd"), dd::main);
     applet_funs.insert(String::from("dirname"), dirname::main);
     applet_funs.insert(String::from("echo"), echo::main);
+    applet_funs.insert(String::from("env"), env::main);
     applet_funs.insert(String::from("expr"), expr::main);
     applet_funs.insert(String::from("false"), r#false::main);
     applet_funs.insert(String::from("fold"), fold::main);
