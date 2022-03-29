@@ -1009,6 +1009,16 @@ pub fn isatty(fd: i32) -> Result<bool>
     }    
 }
 
+pub fn kill(pid: i32, sig: i32) -> Result<()>
+{
+    let res = unsafe { libc::kill(pid, sig) };
+    if res != -1 {
+        Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
 pub fn getgroups() -> Result<Vec<gid_t>>
 {
     let mut groups = vec![0; 1024];

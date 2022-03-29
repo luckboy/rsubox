@@ -34,6 +34,7 @@ pub mod r#false;
 pub mod fold;
 pub mod head;
 pub mod id;
+pub mod kill;
 pub mod link;
 pub mod ln;
 pub mod ls;
@@ -75,6 +76,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("fold"), fold::main);
     applet_funs.insert(String::from("head"), head::main);
     applet_funs.insert(String::from("id"), id::main);
+    applet_funs.insert(String::from("kill"), kill::main);
     applet_funs.insert(String::from("link"), link::main);
     applet_funs.insert(String::from("ln"), ln::main);
     applet_funs.insert(String::from("ls"), ls::main);
