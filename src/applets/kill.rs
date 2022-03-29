@@ -78,13 +78,13 @@ fn kill_process(proc: &String, sig: i32) -> bool
             match kill(pid, sig) {
                 Ok(())   => true,
                 Err(err) => {
-                    eprintln!("{}: {}", pid, err);
+                    eprintln!("{}: {}", proc, err);
                     false
                 },
             }
         },
         Err(err) => {
-            eprintln!("{}", err);
+            eprintln!("{}: {}", proc, err);
             false
         },
     }
