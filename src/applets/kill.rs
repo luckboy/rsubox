@@ -60,6 +60,20 @@ fn print_signals(sigs: &HashMap<String, i32>)
     }
 }
 
+fn print_signal_name(sigs: &HashMap<String, i32>, sig: i32) -> bool
+{
+    match sigs.iter().find(|p| { *(p.1) == sig }) {
+        Some((sig_name, _)) => {
+            println!("{}", sig_name);
+            true
+        },
+        None                => {
+            eprintln!("Unknown signal name");
+            false
+        },
+    }
+}
+
 fn get_signal(sigs: &HashMap<String, i32>, sig_name: &String) -> Option<i32>
 {
     match sigs.get(sig_name) {
@@ -97,9 +111,36 @@ pub fn main(args: &[String]) -> i32
     let mut arg_iter = PushbackIter::new(args.iter().skip(1));
     let mut sig = libc::SIGTERM;
     match arg_iter.next() {
-        Some(arg) if arg == &String::from("-l") => {
-            print_signals(&sigs);
-            return 0;
+        Some(arg) if arg.starts_with("-l") => {
+            let status_s = if arg.len() > 2 {
+                Some(String::from(&arg[2..]))
+            } else {
+                match arg_iter.next() {
+                    Some(arg2) => Some(arg2.clone()),
+                    None       => None,
+                }
+            };
+            match status_s {
+                Some(status_s) => {
+                    match status_s.parse::<i32>() {
+                        Ok(status) => {
+                            if print_signal_name(&sigs, status & 127) {
+                                return 0;
+                            } else {
+                                return 1;
+                            }
+                        },
+                        Err(err) => {
+                            eprintln!("{}", err);
+                            return 1;
+                        },
+                    }
+                },
+                None => {
+                    print_signals(&sigs);
+                    return 0;
+                },
+            }
         },
         Some(arg) if arg.starts_with("-s") => {
             let sig_name = if arg.len() > 2 {
