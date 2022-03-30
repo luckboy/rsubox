@@ -35,6 +35,7 @@ use std::path::*;
 use std::ptr::null;
 use std::ptr::null_mut;
 use std::result;
+use std::slice::*;
 use std::str::*;
 use libc;
 
@@ -68,6 +69,16 @@ pub struct Tm
     pub isdst: i32,
     pub gmtoff: i64,
     pub zone: Option<CString>,
+}
+
+#[derive(Clone)]
+pub struct Utsname
+{
+    pub sysname: OsString,
+    pub nodename: OsString,
+    pub release: OsString,
+    pub version: OsString,
+    pub machine: OsString,
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -1014,6 +1025,29 @@ pub fn kill(pid: i32, sig: i32) -> Result<()>
     let res = unsafe { libc::kill(pid, sig) };
     if res != -1 {
         Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn uname() -> Result<Utsname>
+{
+    let mut libc_name: libc::utsname = unsafe { MaybeUninit::uninit().assume_init() };
+    let res = unsafe { libc::uname(&mut libc_name as *mut libc::utsname) };
+    if res != -1 {
+        let sysname_len = unsafe { libc::strlen(libc_name.sysname.as_ptr() as *const libc::c_char) };
+        let nodename_len = unsafe { libc::strlen(libc_name.nodename.as_ptr() as *const libc::c_char) };
+        let release_len = unsafe { libc::strlen(libc_name.release.as_ptr() as *const libc::c_char) };
+        let version_len = unsafe { libc::strlen(libc_name.version.as_ptr() as *const libc::c_char) };
+        let machine_len = unsafe { libc::strlen(libc_name.machine.as_ptr() as *const libc::c_char) };
+        let name = Utsname {
+            sysname: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.sysname.as_ptr() as *const u8, sysname_len) })),
+            nodename: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.nodename.as_ptr() as *const u8, nodename_len) })),
+            release: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.release.as_ptr() as *const u8, release_len) })),
+            version: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.version.as_ptr() as *const u8, version_len) })),
+            machine: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.machine.as_ptr() as *const u8, machine_len) })),
+        };
+        Ok(name)
     } else {
         Err(Error::last_os_error())
     }
