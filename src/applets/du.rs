@@ -38,7 +38,7 @@ struct Options
     do_flag: DoFlag,
 }
 
-fn can_sum_file(metadata: &fs::Metadata, is_name: bool, opts: &Options, dev_ino_pairs: &mut HashSet<(u64, u64)>, fs_dev: &mut Option<u64>) -> bool
+fn is_file_sum(metadata: &fs::Metadata, is_name: bool, opts: &Options, dev_ino_pairs: &mut HashSet<(u64, u64)>, fs_dev: &mut Option<u64>) -> bool
 {
     if opts.one_fs_flag {
         match fs_dev {
@@ -63,7 +63,7 @@ fn blocks_to_size(blocks: u64, opts: &Options) -> u64
 
 fn descend_into_dir(metadata: &fs::Metadata, is_name: bool, opts: &Options, dev_ino_pairs: &mut HashSet<(u64, u64)>, fs_dev: &mut Option<u64>, stack: &mut Vec<u64>) -> bool
 {
-    if can_sum_file(metadata, is_name, opts, dev_ino_pairs, fs_dev) {
+    if is_file_sum(metadata, is_name, opts, dev_ino_pairs, fs_dev) {
         stack.push(0);
         true
     } else {
@@ -73,7 +73,7 @@ fn descend_into_dir(metadata: &fs::Metadata, is_name: bool, opts: &Options, dev_
 
 fn du_file<P: AsRef<Path>>(path: P, metadata: &fs::Metadata, is_name: bool, opts: &Options, dev_ino_pairs: &mut HashSet<(u64, u64)>, fs_dev: &mut Option<u64>, stack: &mut Vec<u64>)
 {
-    if can_sum_file(metadata, is_name, opts, dev_ino_pairs, fs_dev) {
+    if is_file_sum(metadata, is_name, opts, dev_ino_pairs, fs_dev) {
         let blocks = metadata.blocks();
         if !is_name || opts.report_flag == ReportFlag::All {
             println!("{} {}", blocks_to_size(blocks, opts), path.as_ref().to_string_lossy());
