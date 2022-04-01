@@ -1030,6 +1030,16 @@ pub fn kill(pid: i32, sig: i32) -> Result<()>
     }
 }
 
+pub fn nice(inc: i32) -> Result<i32>
+{
+    let res = unsafe { libc::nice(inc) };
+    if res != -1 {
+        Ok(res)
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
 pub fn uname() -> Result<Utsname>
 {
     let mut libc_name: libc::utsname = unsafe { MaybeUninit::uninit().assume_init() };
