@@ -22,6 +22,7 @@ pub mod cat;
 pub mod chgrp;
 pub mod chmod;
 pub mod chown;
+pub mod cksum;
 pub mod cmp;
 pub mod cp;
 pub mod cut;
@@ -66,6 +67,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("chgrp"), chgrp::main);
     applet_funs.insert(String::from("chmod"), chmod::main);
     applet_funs.insert(String::from("chown"), chown::main);
+    applet_funs.insert(String::from("cksum"), cksum::main);
     applet_funs.insert(String::from("cmp"), cmp::main);
     applet_funs.insert(String::from("cp"), cp::main);
     applet_funs.insert(String::from("cut"), cut::main);
