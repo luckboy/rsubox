@@ -38,11 +38,11 @@ pub fn main(args: &[String]) -> i32
             Some(Ok(Opt('i', _))) => opts.ignored_environment_flag = true,
             Some(Ok(Opt(c, _))) => {
                 eprintln!("unknown option -- {:?}", c);
-                return 1;
+                return 125;
             },
             Some(Err(err)) => {
                 eprintln!("{}", err);
-                return 1;
+                return 125;
             },
             None => break,
         }
