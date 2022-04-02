@@ -39,13 +39,20 @@ use std::slice::*;
 use std::str::*;
 use libc;
 
-pub use libc::{uid_t, gid_t};
+pub use libc::{uid_t, gid_t, clockid_t};
 
 #[derive(Copy, Clone)]
 pub struct TimeValue
 {
     pub sec: i64,
     pub usec: i64,
+}
+
+#[derive(Copy, Clone)]
+pub struct TimeSpec
+{
+    pub sec: i64,
+    pub nsec: i64,
 }
 
 #[derive(Copy, Clone)]
@@ -705,6 +712,99 @@ pub fn dir_name_and_base_name(path: &str, suffix: Option<&str>) -> (String, Stri
     (dir_name, base_name)
 }
 
+fn parse_time_field(chars: &mut Chars, count: usize) -> Option<i32>
+{
+    let mut digits = String::new();
+    for _ in 0..count {
+        match chars.next() {
+            Some(c @ ('0'..='9')) => digits.push(c),
+            _ => return None,
+        }
+    }
+    match digits.parse::<i32>() {
+        Ok(n)  => Some(n),
+        Err(_) => None,
+    }
+}
+
+fn parse_year(chars: &mut Chars, len: usize, is_century: bool) -> Option<i32>
+{
+    if is_century {
+        parse_time_field(chars, len)
+    } else {
+        let last_year_digits = parse_time_field(chars, 2)?;
+        if last_year_digits >= 69 && last_year_digits <= 99 {
+            Some(last_year_digits + 1900)
+        } else {
+            Some(last_year_digits + 2000)
+        }
+    }
+}
+
+fn parse_date_without_seconds(s: &str, is_date_format: bool) -> Option<Tm>
+{
+    let mut tm = Tm {
+        sec: 0,
+        min: 0,
+        hour: 0,
+        mday: 0,
+        mon: 0,
+        year: 0,
+        wday: 0,
+        yday: 0,
+        isdst: -1,
+        gmtoff: 0,
+        zone: None,
+    };
+    let is_century = if s.len() == 10 {
+        false
+    } else if s.len() >= 12 {
+        true
+    } else {
+        return None;
+    };
+    let mut chars = s.chars();
+    if !is_date_format {
+        tm.year = parse_year(&mut chars, s.len() - 8, is_century)? - 1900;
+    }
+    tm.mon = parse_time_field(&mut chars, 2)? - 1;
+    tm.mday = parse_time_field(&mut chars, 2)?;
+    tm.hour = parse_time_field(&mut chars, 2)?;
+    tm.min = parse_time_field(&mut chars, 2)?;
+    if is_date_format {
+        tm.year = parse_year(&mut chars, s.len() - 8, is_century)? - 1900;
+    }
+    match chars.next() {
+        None => Some(tm),
+        _    => None,
+    }
+}
+
+pub fn parse_date(s: &str, is_date_format: bool) -> Option<Tm>
+{
+    match s.split_once('.') {
+        Some((t, u)) => {
+            if u.len() == 2 {
+                match parse_date_without_seconds(t, is_date_format) {
+                    Some(mut tm) => {
+                        let mut chars = u.chars();
+                        tm.sec = parse_time_field(&mut chars, 2)?;
+                        match chars.next() {
+                            None => (),
+                            _    => return None,
+                        }
+                        Some(tm)
+                    },
+                    None => None,
+                }
+            } else {
+                None
+            }
+        },
+        None         => parse_date_without_seconds(s, is_date_format),
+    }
+}
+
 pub fn copy_stream<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Path>, out_path: Option<&Path>) -> bool
 {
     let mut buf: Vec<u8> = vec![0; 4096];
@@ -1058,6 +1158,20 @@ pub fn uname() -> Result<Utsname>
             machine: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.machine.as_ptr() as *const u8, machine_len) })),
         };
         Ok(name)
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn clock_settime(clk_id: clockid_t, time_value: &TimeSpec) -> Result<()>
+{
+    let tmp_time_value = libc::timespec {
+        tv_sec: time_value.sec as libc::time_t,
+        tv_nsec: time_value.nsec as libc::c_long,
+    };
+    let res = unsafe { libc::clock_settime(clk_id, &tmp_time_value as *const libc::timespec) };
+    if res != -1 {
+        Ok(())
     } else {
         Err(Error::last_os_error())
     }
