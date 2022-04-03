@@ -45,7 +45,7 @@ fn am_or_pm(hour: i32) -> &'static str
 fn is_leap(year: i32) -> bool
 { year % 4 == 0  && (year % 100 != 0 || year % 400 == 0) }
 
-// iso_week_days function and week_number function uses algorithms from strftime_l.c file of GNU C
+// Iso_week_days function and week_number function use algorithms from strftime_l.c file of GNU C
 // Library.
 
 fn iso_week_days(yday: i32, wday: i32) -> i32
