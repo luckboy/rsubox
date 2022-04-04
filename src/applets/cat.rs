@@ -34,7 +34,7 @@ fn cat_file(path: &String) -> bool
             Err(err)     => {
                 eprintln!("{}: {}", path, err);
                 false
-            }
+            },
         }
     }
 }

@@ -276,7 +276,7 @@ pub fn main(args: &[String]) -> i32
                     Some(n) => opts.number = ByteOrLineNumber::Bytes(n),
                     None    => {
                         return 1;
-                    }
+                    },
                 }
             },
             Some(Ok(Opt('c', None))) => {
@@ -289,7 +289,7 @@ pub fn main(args: &[String]) -> i32
                     Some(n) => opts.number = ByteOrLineNumber::Lines(n),
                     None    => {
                         return 1;
-                    }
+                    },
                 }
             },
             Some(Ok(Opt('n', None))) => {

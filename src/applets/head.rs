@@ -98,7 +98,7 @@ pub fn main(args: &[String]) -> i32
                     Err(err) => {
                         eprintln!("{}", err);
                         return 1;
-                    }
+                    },
                 }
             },
             Some(Ok(Opt('n', None))) => {
