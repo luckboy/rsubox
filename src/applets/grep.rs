@@ -287,7 +287,7 @@ pub fn main(args: &[String]) -> i32
         inverted_match_flag: false,
         line_flag: false,
     };
-    let mut is_regex_and_file = false;
+    let mut is_regex_or_file = false;
     loop {
         match opt_parser.next() {
             Some(Ok(Opt('c', _))) => opts.output_flag = OutputFlag::Count,
@@ -296,7 +296,7 @@ pub fn main(args: &[String]) -> i32
                 if !add_patterns_from_string(&opt_arg, &mut opts.patterns) {
                     return 2;
                 }
-                is_regex_and_file = true;
+                is_regex_or_file = true;
             },
             Some(Ok(Opt('e', None))) => {
                 eprintln!("option requires an argument -- 'e'");
@@ -307,7 +307,7 @@ pub fn main(args: &[String]) -> i32
                 if !read_patterns_from_file(&opt_arg, &mut opts.patterns) {
                     return 2;
                 }
-                is_regex_and_file = true;
+                is_regex_or_file = true;
             },
             Some(Ok(Opt('f', None))) => {
                 eprintln!("option requires an argument -- 'f'");
@@ -332,7 +332,7 @@ pub fn main(args: &[String]) -> i32
         }
     }
     let mut arg_iter = args.iter().skip(opt_parser.index());
-    if !is_regex_and_file {
+    if !is_regex_or_file {
         match arg_iter.next() {
             Some(patterns) => {
                 if !add_patterns_from_string(patterns, &mut opts.patterns) {
