@@ -37,7 +37,6 @@ fn print_current_dir() -> bool
 {
     match env::current_dir() {
         Ok(path_buf) => {
-            println!("normal");
             println!("{}", path_buf.as_path().to_string_lossy());
             true
         },
