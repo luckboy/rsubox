@@ -48,6 +48,7 @@ pub mod mv;
 pub mod nice;
 pub mod paste;
 pub mod printf;
+pub mod pwd;
 pub mod rm;
 pub mod rmdir;
 pub mod sort;
@@ -97,6 +98,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("nice"), nice::main);
     applet_funs.insert(String::from("paste"), paste::main);
     applet_funs.insert(String::from("printf"), printf::main);
+    applet_funs.insert(String::from("pwd"), pwd::main);
     applet_funs.insert(String::from("rm"), rm::main);
     applet_funs.insert(String::from("rmdir"), rmdir::main);
     applet_funs.insert(String::from("sort"), sort::main);
