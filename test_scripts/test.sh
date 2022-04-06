@@ -36,22 +36,27 @@ start_test_suites
 . ./test_scripts/chgrp_tests.sh
 . ./test_scripts/chmod_tests.sh
 . ./test_scripts/chown_tests.sh
+. ./test_scripts/cksum_tests.sh
 . ./test_scripts/cmp_tests.sh
 . ./test_scripts/cp_tests.sh
 . ./test_scripts/cut_tests.sh
 . ./test_scripts/dd_tests.sh
 . ./test_scripts/dirname_tests.sh
+. ./test_scripts/du_tests.sh
 . ./test_scripts/echo_tests.sh
+. ./test_scripts/env_tests.sh
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
 . ./test_scripts/fold_tests.sh
 . ./test_scripts/head_tests.sh
+. ./test_scripts/id_tests.sh
 . ./test_scripts/link_tests.sh
 . ./test_scripts/ln_tests.sh
 . ./test_scripts/ls_tests.sh
 . ./test_scripts/mkdir_tests.sh
 . ./test_scripts/mkfifo_tests.sh
 . ./test_scripts/mv_tests.sh
+. ./test_scripts/nice_tests.sh
 . ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/rm_tests.sh
@@ -62,6 +67,7 @@ start_test_suites
 . ./test_scripts/test_tests.sh
 . ./test_scripts/tr_tests.sh
 . ./test_scripts/true_tests.sh
+. ./test_scripts/uname_tests.sh
 . ./test_scripts/unlink_tests.sh
 . ./test_scripts/wc_tests.sh
 end_test_suites
