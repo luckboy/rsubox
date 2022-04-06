@@ -31,6 +31,14 @@ start_test uname "uname prints all"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test uname "uname prints system name and system release"
+    "../$RSUBOX" uname -sr > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_content 2 "`uname -sr`" ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
 start_test uname "uname prints system name"
     "../$RSUBOX" uname -s > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
