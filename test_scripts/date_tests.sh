@@ -602,6 +602,14 @@ start_test date "date prints string for %Oy conversion"
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
 
+start_test date "date complains on too many arguments"
+    "../$RSUBOX" date -T 041015262010.37 '+%H' xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 "Too many arguments" ../test_tmp/stderr.txt
+end_test
+
 start_test date "date complains on invalid format character"
     "../$RSUBOX" date -T 041015262010.37 '+%f' > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
