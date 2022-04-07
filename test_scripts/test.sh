@@ -66,6 +66,7 @@ start_test_suites
 . ./test_scripts/tail_tests.sh
 . ./test_scripts/tee_tests.sh
 . ./test_scripts/test_tests.sh
+. ./test_scripts/touch_tests.sh
 . ./test_scripts/tr_tests.sh
 . ./test_scripts/true_tests.sh
 . ./test_scripts/uname_tests.sh
