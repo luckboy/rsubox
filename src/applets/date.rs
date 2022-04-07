@@ -88,6 +88,7 @@ fn convert_tm_without_modifier(format_iter: &mut PushbackIter<Chars>, tm: &Tm) -
         Some('r') => print!("{:02}:{:02}:{:02} {}", hour24_to_hour12(tm.hour), tm.min, tm.sec, am_or_pm(tm.hour)),
         Some('S') => print!("{:02}", tm.sec),
         Some('t') => print!("\t"),
+        Some('T') => print!("{:02}:{:02}:{:02}", tm.hour, tm.min, tm.sec),
         Some('u') => print!("{}", (tm.wday + 6) % 7 + 1),
         Some('U') => print!("{:02}", (tm.yday + 7 - tm.wday) / 7),
         Some('V') => print!("{:02}", week_number(tm)),
