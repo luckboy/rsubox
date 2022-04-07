@@ -189,3 +189,11 @@ start_test id "id prints group identifiers for root"
     assert_compare_files 2 ../test_tmp/expected_groups_sorted.txt ../test_tmp/groups_sorted.txt &&
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
+
+start_test id "id complains on too many arguments"
+    "../$RSUBOX" id root user > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'Too many arguments' ../test_tmp/stderr.txt
+end_test
