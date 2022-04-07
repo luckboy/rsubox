@@ -40,6 +40,7 @@ start_test_suites
 . ./test_scripts/cmp_tests.sh
 . ./test_scripts/cp_tests.sh
 . ./test_scripts/cut_tests.sh
+. ./test_scripts/date_tests.sh
 . ./test_scripts/dd_tests.sh
 . ./test_scripts/dirname_tests.sh
 . ./test_scripts/du_tests.sh
