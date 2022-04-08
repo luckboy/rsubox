@@ -49,6 +49,7 @@ start_test_suites
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
 . ./test_scripts/fold_tests.sh
+. ./test_scripts/grep_tests.sh
 . ./test_scripts/head_tests.sh
 . ./test_scripts/id_tests.sh
 . ./test_scripts/link_tests.sh
@@ -60,6 +61,7 @@ start_test_suites
 . ./test_scripts/nice_tests.sh
 . ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
+. ./test_scripts/pwd_tests.sh
 . ./test_scripts/rm_tests.sh
 . ./test_scripts/rmdir_tests.sh
 . ./test_scripts/sort_tests.sh
