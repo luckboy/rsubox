@@ -354,7 +354,7 @@ start_test grep "grep prints lines from file for inverted match"
     assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
-start_test grep "grep prints lines from file for inverted match"
+start_test grep "grep prints lines from file for inverted match and two regular expressions"
     "../$RSUBOX" grep -v -e 'com[a-z]*' -e 'p[ei][a-z]*' ../test_fixtures/test_grep.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 = "$?" ] &&
