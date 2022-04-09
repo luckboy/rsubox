@@ -46,6 +46,7 @@ pub mod mkdir;
 pub mod mkfifo;
 pub mod mv;
 pub mod nice;
+pub mod nl;
 pub mod paste;
 pub mod printf;
 pub mod pwd;
@@ -96,6 +97,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("mkfifo"), mkfifo::main);
     applet_funs.insert(String::from("mv"), mv::main);
     applet_funs.insert(String::from("nice"), nice::main);
+    applet_funs.insert(String::from("nl"), nl::main);
     applet_funs.insert(String::from("paste"), paste::main);
     applet_funs.insert(String::from("printf"), printf::main);
     applet_funs.insert(String::from("pwd"), pwd::main);
