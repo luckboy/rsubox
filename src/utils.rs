@@ -25,6 +25,7 @@ use std::fs;
 use std::fs::*;
 use std::mem::MaybeUninit;
 use std::os::unix::ffi::OsStrExt;
+use std::os::unix::ffi::OsStringExt;
 use std::os::unix::fs::DirBuilderExt;
 use std::os::unix::fs::FileTypeExt;
 use std::os::unix::fs::MetadataExt;
@@ -1118,6 +1119,22 @@ pub fn isatty(fd: i32) -> Result<bool>
     } else {
         Err(Error::last_os_error())
     }    
+}
+
+pub fn ttyname(fd: i32) -> Result<PathBuf>
+{
+    let mut buf: Vec<u8> = vec![0; libc::PATH_MAX as usize];
+    let res = unsafe { libc::ttyname_r(fd, buf.as_ptr() as *mut libc::c_char, libc::PATH_MAX as usize) };
+    if res == 0 {
+        let len = unsafe { libc::strlen(buf.as_ptr() as *mut libc::c_char) };
+        buf.resize(len, 0);
+        let osstring = OsString::from_vec(buf);
+        let mut path_buf = PathBuf::new();
+        path_buf.push(osstring);
+        Ok(path_buf)
+    } else {
+        Err(Error::from_raw_os_error(res))
+    }
 }
 
 pub fn kill(pid: i32, sig: i32) -> Result<()>
