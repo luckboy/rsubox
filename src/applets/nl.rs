@@ -21,7 +21,7 @@ use std::path::*;
 use getopt::Opt;
 use crate::utils::*;
 
-enum NumberType
+enum NumberingType
 {
     AllLines,
     NonEmptyLines,
@@ -38,9 +38,9 @@ enum NumberFormat
 
 struct Options
 {
-    body_number_type: NumberType,
-    header_number_type: NumberType,
-    footer_number_type: NumberType,
+    body_numbering_type: NumberingType,
+    header_numbering_type: NumberingType,
+    footer_numbering_type: NumberingType,
     delimiter: String,
     increment: u64,
     join_blank_line_count: u64,
@@ -93,13 +93,13 @@ fn format_line_number(opts: &Options, data: &mut Data, is_number: bool) -> Strin
     }
 }
 
-fn is_line_number(line: &str, number_type: &NumberType) -> bool
+fn is_line_number(line: &str, numbering_type: &NumberingType) -> bool
 {
-    match number_type {
-        NumberType::AllLines          => true,
-        NumberType::NonEmptyLines     => !line.is_empty(),
-        NumberType::NoLines           => false,
-        NumberType::RegexLines(regex) => regex.is_match(line, None, 0),
+    match numbering_type {
+        NumberingType::AllLines          => true,
+        NumberingType::NonEmptyLines     => !line.is_empty(),
+        NumberingType::NoLines           => false,
+        NumberingType::RegexLines(regex) => regex.is_match(line, None, 0),
     }
 }
 
@@ -142,9 +142,9 @@ fn nl<R: Read>(r: &mut R, path: Option<&Path>, opts: &Options, data: &mut Data) 
                         };
                         if is_number {
                             is_number = match data.page_section {
-                                PageSection::Header => is_line_number(line_without_newline, &opts.header_number_type),
-                                PageSection::Body   => is_line_number(line_without_newline, &opts.body_number_type),
-                                PageSection::Footer => is_line_number(line_without_newline, &opts.footer_number_type),
+                                PageSection::Header => is_line_number(line_without_newline, &opts.header_numbering_type),
+                                PageSection::Body   => is_line_number(line_without_newline, &opts.body_numbering_type),
+                                PageSection::Footer => is_line_number(line_without_newline, &opts.footer_numbering_type),
                             };
                         }
                         let formated_line_number = format_line_number(opts, data, is_number);
@@ -188,17 +188,17 @@ fn nl_file<P: AsRef<Path>>(path: P, opts: &Options, data: &mut Data) -> bool
     }
 }
 
-fn parse_number_type(s: &String) -> Option<NumberType>
+fn parse_numbering_type(s: &String) -> Option<NumberingType>
 {
     if s == &String::from("a") {
-        Some(NumberType::AllLines)
+        Some(NumberingType::AllLines)
     } else if s == &String::from("t") {
-        Some(NumberType::NonEmptyLines)
+        Some(NumberingType::NonEmptyLines)
     } else if s == &String::from("n") {
-        Some(NumberType::NoLines)
+        Some(NumberingType::NoLines)
     } else if s.starts_with("p") {
         match Regex::new(&s[1..], 0) {
-            Ok(regex) => Some(NumberType::RegexLines(regex)),
+            Ok(regex) => Some(NumberingType::RegexLines(regex)),
             Err(err)  => {
                 eprintln!("{}", err);
                 None
@@ -240,9 +240,9 @@ pub fn main(args: &[String]) -> i32
 {
     let mut opt_parser = getopt::Parser::new(args, "b:d:f:h:i:l:n:ps:v:w:");
     let mut opts = Options {
-        body_number_type: NumberType::NonEmptyLines,
-        header_number_type: NumberType::NoLines,
-        footer_number_type: NumberType::NoLines,
+        body_numbering_type: NumberingType::NonEmptyLines,
+        header_numbering_type: NumberingType::NoLines,
+        footer_numbering_type: NumberingType::NoLines,
         delimiter: String::from("\\:"),
         increment: 1,
         join_blank_line_count: 1,
@@ -255,8 +255,8 @@ pub fn main(args: &[String]) -> i32
     loop {
         match opt_parser.next() {
             Some(Ok(Opt('b', Some(opt_arg)))) => {
-                match parse_number_type(&opt_arg) {
-                    Some(number_type) => opts.body_number_type = number_type,
+                match parse_numbering_type(&opt_arg) {
+                    Some(number_type) => opts.body_numbering_type = number_type,
                     None              => return 1,
                 }
             },
@@ -270,8 +270,8 @@ pub fn main(args: &[String]) -> i32
                 return 1;
             },
             Some(Ok(Opt('f', Some(opt_arg)))) => {
-                match parse_number_type(&opt_arg) {
-                    Some(number_type) => opts.footer_number_type = number_type,
+                match parse_numbering_type(&opt_arg) {
+                    Some(number_type) => opts.footer_numbering_type = number_type,
                     None              => return 1,
                 }
             },
@@ -280,8 +280,8 @@ pub fn main(args: &[String]) -> i32
                 return 1;
             },
             Some(Ok(Opt('h', Some(opt_arg)))) => {
-                match parse_number_type(&opt_arg) {
-                    Some(number_type) => opts.header_number_type = number_type,
+                match parse_numbering_type(&opt_arg) {
+                    Some(number_type) => opts.header_numbering_type = number_type,
                     None              => return 1,
                 }
             },
