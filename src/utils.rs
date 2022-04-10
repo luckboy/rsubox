@@ -1194,6 +1194,12 @@ pub fn clock_settime(clk_id: clockid_t, time_value: &TimeSpec) -> Result<()>
     }
 }
 
+pub fn sync()
+{ unsafe { libc::sync(); }; }
+
+pub fn makedev(major: u32, minor: u32) -> u64
+{ unsafe { libc::makedev(major, minor) as u64 } }
+
 pub fn getgroups() -> Result<Vec<gid_t>>
 {
     let mut groups = vec![0; 1024];
