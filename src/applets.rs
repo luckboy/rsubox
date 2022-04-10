@@ -119,6 +119,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("unlink"), unlink::main);
     applet_funs.insert(String::from("wc"), wc::main);
     // Non-standard applets.
+    applet_funs.insert(String::from("chroot"), nonstd::chroot::main);
     applet_funs.insert(String::from("mknod"), nonstd::mknod::main);
     applet_funs.insert(String::from("realpath"), nonstd::realpath::main);
     applet_funs.insert(String::from("sync"), nonstd::sync::main);
