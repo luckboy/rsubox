@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-start_test mkfifo "mkdir makes FIFO file"
+start_test mkfifo "mkfifo makes FIFO file"
     "../$RSUBOX" mkfifo xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
