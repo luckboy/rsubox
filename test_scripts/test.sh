@@ -59,6 +59,7 @@ start_test_suites
 . ./test_scripts/mkfifo_tests.sh
 . ./test_scripts/mv_tests.sh
 . ./test_scripts/nice_tests.sh
+. ./test_scripts/nl_tests.sh
 . ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/pwd_tests.sh
@@ -74,4 +75,7 @@ start_test_suites
 . ./test_scripts/uname_tests.sh
 . ./test_scripts/unlink_tests.sh
 . ./test_scripts/wc_tests.sh
+# Tests of non-standard applets.
+. ./test_scripts/nonstd/mknod_tests.sh
+. ./test_scripts/nonstd/realpath_tests.sh
 end_test_suites
