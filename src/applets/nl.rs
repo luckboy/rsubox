@@ -89,7 +89,8 @@ fn format_line_number(opts: &Options, data: &mut Data, is_number: bool) -> Strin
         data.line_number = data.line_number.saturating_add(opts.increment);
         s
     } else {
-        format!("{:width$} ", "", width = opts.number_width)
+        let len = opts.separator.chars().fold(0, |x, _| x + 1);
+        format!("{:width$}{:width2$}", "", "", width = opts.number_width, width2 = len)
     }
 }
 
@@ -205,7 +206,7 @@ fn parse_numbering_type(s: &String) -> Option<NumberingType>
             },
         }
     } else {
-        eprintln!("Invalid number type");
+        eprintln!("Invalid numbering type");
         None
     }
 }
