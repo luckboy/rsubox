@@ -5,7 +5,7 @@ language. This program contains common Unix utilities.
 
 ## Compliance with standard
 
-These utilities most compliant with the SUSV3 (Single UNIX Specification Version 3). Non-compliance
+These utilities are most compliant with the SUSV3 (Single UNIX Specification Version 3). Non-compliance
 with the SUSV3 is most caused security and size of the utilities. The most utilities are from the
 SUSV3. Also, this program contains some non-standard utilities.
 
