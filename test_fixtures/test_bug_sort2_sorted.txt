@@ -1,0 +1,4 @@
+cccc	dddd
+cccc   bbbb
+bbbb   cccc
+aaaa aaaa

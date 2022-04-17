@@ -117,9 +117,10 @@ fn merge_string_arrays_by<F>(ss: &[String], ts: &[String], mut f: F) -> Vec<Stri
 
 fn str_to_number_str(s: &str) -> &str
 {
-    let t = if s.starts_with('-') { &s[1..] } else { s };
-    let u = t.trim_start_matches(|c: char| c.is_ascii_digit());
-    &s[0..(u.as_ptr() as usize - s.as_ptr() as usize)]
+    let t = s.trim_start();
+    let u = if t.starts_with('-') { &t[1..] } else { t };
+    let v = u.trim_start_matches(|c: char| c.is_ascii_digit());
+    &t[..(v.as_ptr() as usize - t.as_ptr() as usize)]
 }
 
 fn simply_compare_strs_for_order_options(s1: &str, s2: &str, order_opts: &OrderOptions) -> Ordering
@@ -204,7 +205,48 @@ fn get_fields_from_str<'a>(s: &'a str, opts: &Options) -> Vec<&'a str>
 {
     match opts.separator {
         Some(c) => s.split(c).collect(),
-        None    => s.split(char::is_whitespace).collect(),
+        None    => {
+            let mut iter = PushbackIter::new(s.char_indices());
+            let mut fields: Vec<&'a str> = Vec::new();
+            let mut i: usize = 0;
+            let mut j: usize;
+            loop {
+                let mut is_first = true;
+                loop {
+                    match iter.next() {
+                        Some((k, c)) if c.is_whitespace() => {
+                            if is_first { i = k; }
+                            is_first = false;
+                        },
+                        Some((k, _)) => {
+                            if is_first { i = k; }
+                            break;
+                        },
+                        None => {
+                            if is_first { i = s.len(); }
+                            break;
+                        },
+                    }
+                }
+                loop {
+                    match iter.next() {
+                        Some((_, c)) if !c.is_whitespace() => (),
+                        Some((k, c)) => {
+                            iter.undo((k, c));
+                            j = k;
+                            break;
+                        },
+                        None => {
+                            j = s.len();
+                            break;
+                        },
+                    }
+                }
+                fields.push(&s[i..j]);
+                if i == s.len() { break; }
+            }
+            fields
+        },
     }
 }
 

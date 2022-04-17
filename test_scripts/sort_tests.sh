@@ -405,7 +405,7 @@ start_test sort "sort sorts lines for first key with character positions"
     echo bbbb bbaaabb bbbb >> test.txt
     echo cccc ccdddcc cccc >> test.txt
     echo dddd ddcccdd dddd >> test.txt
-    "../$RSUBOX" sort -k 2.3,2.5 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.4,2.6 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -421,7 +421,7 @@ start_test sort "sort sorts lines for second key with character position"
     echo bbbb baaa aaaa >> test.txt
     echo cccc cddd cccc >> test.txt
     echo dddd dccc dddd >> test.txt
-    "../$RSUBOX" sort -k 2.2 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.3 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -437,7 +437,7 @@ start_test sort "sort sorts lines for third key with character positions"
     echo aaaa aaaa aaaa aaaa >> test.txt
     echo cccc ccaa aaac cccc >> test.txt
     echo aaaa aadd ddda aaaa >> test.txt
-    "../$RSUBOX" sort -k 2.3,3.3 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.4,3.4 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -453,7 +453,7 @@ start_test sort "sort sorts lines for fourth key with character positions"
     echo aaaa aaaa aaaa aaaa >> test.txt
     echo cccc ccaa cccc cccc >> test.txt
     echo aaaa aadd aaaa aaaa >> test.txt
-    "../$RSUBOX" sort -k 2.3,1.10 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.4,1.10 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -469,7 +469,7 @@ start_test sort "sort sorts lines for fiveth key with character positions"
     echo aaaa aaaa >> test.txt
     echo cccc ccaa aaac >> test.txt
     echo aaaa aadd >> test.txt
-    "../$RSUBOX" sort -k 2.3,3.3 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.4,3.4 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -485,7 +485,7 @@ start_test sort "sort sorts lines for sixth key and character position"
     echo bbbb baaa bbbb >> test.txt
     echo cccc cddd cccc >> test.txt
     echo dddd dccc dddd >> test.txt
-    "../$RSUBOX" sort -k 2.2,2.0 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+    "../$RSUBOX" sort -k 2.3,2.0 test.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 4 ../test_tmp/stdout.txt &&
@@ -872,5 +872,21 @@ start_test sort "sort sorts lines for bug of sorting character boundary"
 
     assert 1 [ 0 = "$?" ] &&
     assert_compare_files 2 ../test_fixtures/test_bug_sort1_sorted.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
+start_test sort "sort sorts lines for bug of sorting blank seperator"
+    "../$RSUBOX" sort -k 2,2 ../test_fixtures/test_bug_sort2.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_fixtures/test_bug_sort2_sorted.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test
+
+start_test sort "sort sorts lines for bug of sorting numbers"
+    "../$RSUBOX" sort -n ../test_fixtures/test_bug_sort3.txt > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_fixtures/test_bug_sort3_sorted.txt ../test_tmp/stdout.txt &&
     assert_file_size 3 0 ../test_tmp/stderr.txt
 end_test
