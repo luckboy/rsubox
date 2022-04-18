@@ -133,7 +133,7 @@ fn simply_compare_strs_for_order_options(s1: &str, s2: &str, order_opts: &OrderO
             match t1.parse::<i64>() {
                 Ok(n)  => n,
                 Err(_) => {
-                    if s1.starts_with('-') { i64::MIN } else { i64::MAX }
+                    if t1.starts_with('-') { i64::MIN } else { i64::MAX }
                 },
             }
         };
@@ -144,7 +144,7 @@ fn simply_compare_strs_for_order_options(s1: &str, s2: &str, order_opts: &OrderO
             match t2.parse::<i64>() {
                 Ok(n)  => n,
                 Err(_) => {
-                    if s2.starts_with('-') { i64::MIN } else { i64::MAX }
+                    if t2.starts_with('-') { i64::MIN } else { i64::MAX }
                 },
             }
         };
