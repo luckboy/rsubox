@@ -243,7 +243,7 @@ fn get_fields_from_str<'a>(s: &'a str, opts: &Options) -> Vec<&'a str>
                     }
                 }
                 fields.push(&s[i..j]);
-                if i == s.len() { break; }
+                if j == s.len() { break; }
             }
             fields
         },
