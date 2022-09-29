@@ -321,3 +321,12 @@ start_test cut "cut complains on file that doesn't contain valid UTF-8"
     assert 1 [ 0 != "$?" ] &&
     assert_file_content_pattern 2 '^\.\./test_fixtures/test_cut_space_invalid_utf8.txt: stream' ../test_tmp/stderr.txt
 end_test
+
+start_test cut "cut writes cutted data for bug of blank separated list"
+    printf 'abcdef\tghijkl\n' > ../test_tmp/expected.txt
+    (printf 'abcdef\tghijkl\tmnopqr\n') | "../$RSUBOX" cut -f '1 2' > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_compare_files 2 ../test_tmp/expected.txt ../test_tmp/stdout.txt &&
+    assert_file_size 3 0 ../test_tmp/stderr.txt
+end_test

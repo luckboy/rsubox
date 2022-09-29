@@ -374,7 +374,7 @@ fn parse_list(s: &String, list: &mut List) -> bool
     list.elems.clear();
     list.end = None;
     let mut new_elems: Vec<usize> = Vec::new();
-    for t in s.split(',') {
+    for t in s.split(|c: char| { c.is_whitespace() || c == ',' }) {
         match t.split_once("-") {
             Some(("", "")) => {
                 eprintln!("Invalid range");
