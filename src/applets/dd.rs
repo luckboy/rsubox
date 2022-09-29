@@ -99,7 +99,8 @@ fn move_to_fd_file(file: File, new_fd: RawFd) -> Option<File>
 {
     let old_fd: RawFd = file.into_raw_fd();
     let mut is_success = loop {
-        match dup2(old_fd, new_fd) {
+        let res = unsafe { dup2(old_fd, new_fd) };
+        match res {
             Ok(()) => break true,
             Err(err) if err.kind() == ErrorKind::Interrupted => (),
             Err(err) => {
@@ -110,7 +111,8 @@ fn move_to_fd_file(file: File, new_fd: RawFd) -> Option<File>
     };
     if is_success {
         is_success = loop {
-            match close(old_fd) {
+            let res = unsafe { close(old_fd) };
+            match res {
                 Ok(()) => break true,
                 Err(err) if err.kind() == ErrorKind::Interrupted => (),
                 Err(err) => {
