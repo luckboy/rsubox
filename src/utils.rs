@@ -1091,9 +1091,29 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 pub fn umask(mask: u32) -> u32 
 { unsafe { libc::umask(mask as libc::mode_t) as u32 } }
 
-pub unsafe fn dup(fd: i32) -> Result<i32>
+pub fn fcntl_f_getfd(fd: i32) -> Result<i32>
 {
-    let res = libc::dup(fd);
+    let res = unsafe { libc::fcntl(fd, libc::F_GETFD) };
+    if res != -1 {
+        Ok(res)
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub unsafe fn fcntl_f_setfd(fd: i32, flags: i32) -> Result<()>
+{
+    let res = libc::fcntl(fd, libc::F_SETFD, flags);
+    if res != -1 {
+        Ok(())
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
+pub fn dup(fd: i32) -> Result<i32>
+{
+    let res = unsafe { libc::dup(fd) };
     if res != -1 {
         Ok(res)
     } else {
@@ -1206,6 +1226,26 @@ pub fn clock_settime(clk_id: clockid_t, time_value: &TimeSpec) -> Result<()>
 
 pub fn sync()
 { unsafe { libc::sync(); }; }
+
+pub fn dup_with_cloexec(fd: i32) -> Result<i32>
+{
+    let new_fd = dup(fd)?;
+    match fcntl_f_getfd(new_fd) {
+        Ok(flags) => {
+            match unsafe { fcntl_f_setfd(new_fd, flags | libc::FD_CLOEXEC) } {
+                Ok(()) => Ok(new_fd),
+                Err(err) => {
+                    let _res = unsafe { close(new_fd) };
+                    Err(err)
+                },
+            }
+        },
+        Err(err) => {
+            let _res = unsafe { close(new_fd) };
+            Err(err)
+        },
+    }
+}
 
 pub fn makedev(major: u32, minor: u32) -> u64
 { unsafe { libc::makedev(major, minor) as u64 } }

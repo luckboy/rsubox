@@ -36,8 +36,7 @@ pub fn main(args: &[String]) -> i32
             let mut stdin_file = unsafe { File::from_raw_fd(0) };
             let mut stdout_file = unsafe { File::from_raw_fd(1) };
             let mut stderr_file = unsafe { File::from_raw_fd(2) };
-            let res = unsafe { dup(2) };
-            let mut stderr_file2 = match res {
+            let mut stderr_file2 = match dup_with_cloexec(2) {
                 Ok(fd)   => unsafe { File::from_raw_fd(fd) },
                 Err(err) => {
                     eprintln!("{}", err);
@@ -90,8 +89,7 @@ pub fn main(args: &[String]) -> i32
             }
             match isatty(2) {
                 Ok(true) => {
-                    let res = unsafe { dup(stdout_file.as_raw_fd()) };
-                    match res {
+                    match dup_with_cloexec(stdout_file.as_raw_fd()) {
                         Ok(fd)   => stderr_file = unsafe { File::from_raw_fd(fd) },
                         Err(err) => {
                             eprintln!("{}", err);
