@@ -55,6 +55,7 @@ pub mod rm;
 pub mod rmdir;
 pub mod sleep;
 pub mod sort;
+pub mod split;
 pub mod tail;
 pub mod tee;
 pub mod test;
@@ -111,6 +112,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("rmdir"), rmdir::main);
     applet_funs.insert(String::from("sleep"), sleep::main);
     applet_funs.insert(String::from("sort"), sort::main);
+    applet_funs.insert(String::from("split"), split::main);
     applet_funs.insert(String::from("tail"), tail::main);
     applet_funs.insert(String::from("tee"), tee::main);
     applet_funs.insert(String::from("test"), test::main);
