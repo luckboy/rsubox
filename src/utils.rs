@@ -1091,6 +1091,16 @@ pub fn utimes<P: AsRef<Path>>(path: P, times: &Times) -> Result<()>
 pub fn umask(mask: u32) -> u32 
 { unsafe { libc::umask(mask as libc::mode_t) as u32 } }
 
+pub unsafe fn dup(fd: i32) -> Result<i32>
+{
+    let res = libc::dup(fd);
+    if res != -1 {
+        Ok(res)
+    } else {
+        Err(Error::last_os_error())
+    }
+}
+
 pub unsafe fn dup2(old_fd: i32, new_fd: i32) -> Result<()>
 {
     let res = libc::dup2(old_fd, new_fd);
