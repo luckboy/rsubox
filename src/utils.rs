@@ -1247,6 +1247,7 @@ pub fn dup_with_cloexec(fd: i32) -> Result<i32>
     }
 }
 
+#[allow(unused_unsafe)] 
 pub fn makedev(major: u32, minor: u32) -> u64
 { unsafe { libc::makedev(major, minor) as u64 } }
 
