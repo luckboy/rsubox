@@ -29,14 +29,14 @@ struct Options
 fn get_tab_stop(i: usize, opts: &Options) -> u64
 {
     if opts.tab_stops.is_empty() {
-        ((i as u64) + 1) * 8
+        ((i as u64) + 1).saturating_mul(8)
     } else if opts.tab_stops.len() == 1 {
-        ((i as u64) + 1)* opts.tab_stops[0]
+        ((i as u64) + 1).saturating_mul(opts.tab_stops[0])
     } else {
         if i < opts.tab_stops.len() {
             opts.tab_stops[i]
         } else {
-            opts.tab_stops[opts.tab_stops.len() - 1] + ((i - opts.tab_stops.len()) as u64) + 1
+            opts.tab_stops[opts.tab_stops.len() - 1].saturating_add(((i - opts.tab_stops.len()) as u64) + 1)
         }
     }
 }
