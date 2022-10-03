@@ -147,7 +147,7 @@ fn parse_tab_stops(s: &String, tab_stops: &mut Vec<u64>) -> bool
             Ok(n)    => tab_stops.push(n),
             Err(err) => {
                 eprintln!("{}", err);
-                break;
+                return false;
             },
         }
     }

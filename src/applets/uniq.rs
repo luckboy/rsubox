@@ -271,7 +271,18 @@ fn uniq<R: Read, W: Write>(r: &mut R, w: &mut W, in_path: Option<&Path>, out_pat
 fn uniq_file(in_path: &String, out_path: Option<&Path>, opts: &Options) -> bool
 {
     if in_path == &String::from("-") {
-        uniq(&mut stdin(), &mut stdout(), None, None, opts)
+        match out_path {
+            Some(out_path) => {
+                match File::create(out_path) {
+                    Ok(mut out_file) => uniq(&mut stdin(), &mut out_file, None, Some(out_path), opts),
+                    Err(err)         => {
+                        eprintln!("{}: {}", out_path.to_string_lossy(), err);
+                        false
+                    },
+                }
+            },
+            None => uniq(&mut stdin(), &mut stdout(), None, None, opts),
+        }
     } else {
         match File::open(in_path) {
             Ok(mut in_file) => {

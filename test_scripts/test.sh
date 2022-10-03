@@ -46,6 +46,7 @@ start_test_suites
 . ./test_scripts/du_tests.sh
 . ./test_scripts/echo_tests.sh
 . ./test_scripts/env_tests.sh
+. ./test_scripts/expand_tests.sh
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
 . ./test_scripts/fold_tests.sh
@@ -60,12 +61,14 @@ start_test_suites
 . ./test_scripts/mv_tests.sh
 . ./test_scripts/nice_tests.sh
 . ./test_scripts/nl_tests.sh
+. ./test_scripts/nohup_tests.sh
 . ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/pwd_tests.sh
 . ./test_scripts/rm_tests.sh
 . ./test_scripts/rmdir_tests.sh
 . ./test_scripts/sort_tests.sh
+. ./test_scripts/split_tests.sh
 . ./test_scripts/tail_tests.sh
 . ./test_scripts/tee_tests.sh
 . ./test_scripts/test_tests.sh
@@ -73,6 +76,7 @@ start_test_suites
 . ./test_scripts/tr_tests.sh
 . ./test_scripts/true_tests.sh
 . ./test_scripts/uname_tests.sh
+. ./test_scripts/uniq_tests.sh
 . ./test_scripts/unlink_tests.sh
 . ./test_scripts/wc_tests.sh
 # Tests of non-standard applets.
