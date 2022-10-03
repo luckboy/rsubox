@@ -146,7 +146,7 @@ start_test nl "nl complains on invalid number format"
 end_test
 
 start_test nl "nl complains on non-existent file"
-    "../$RSUBOX" cat xxx  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+    "../$RSUBOX" nl xxx  > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 != "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
