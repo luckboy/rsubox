@@ -35,6 +35,7 @@ pub mod env;
 pub mod expand;
 pub mod expr;
 pub mod r#false;
+pub mod find;
 pub mod fold;
 pub mod grep;
 pub mod head;
@@ -93,6 +94,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("expand"), expand::main);
     applet_funs.insert(String::from("expr"), expr::main);
     applet_funs.insert(String::from("false"), r#false::main);
+    applet_funs.insert(String::from("find"), find::main);
     applet_funs.insert(String::from("fold"), fold::main);
     applet_funs.insert(String::from("grep"), grep::main);
     applet_funs.insert(String::from("head"), head::main);

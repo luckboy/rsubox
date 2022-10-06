@@ -38,6 +38,7 @@ use std::ptr::null_mut;
 use std::result;
 use std::slice::*;
 use std::str::*;
+use fnmatch_sys;
 use libc;
 
 pub use libc::{uid_t, gid_t, clockid_t};
@@ -1370,6 +1371,14 @@ pub fn mktime(tm: &mut Tm) -> Result<i64>
     }
 }
 
+pub fn fnmatch<S: AsRef<OsStr>, P: AsRef<Path>>(pattern: S, path: P, flags: i32) -> bool
+{
+    let pattern_cstring = CString::new(pattern.as_ref().as_bytes()).unwrap();
+    let path_cstring = CString::new(path.as_ref().as_os_str().as_bytes()).unwrap();
+    let res = unsafe { fnmatch_sys::fnmatch(pattern_cstring.as_ptr(), path_cstring.as_ptr(), flags) };
+    res == 0
+}
+
 pub fn month_name(month: i32) -> Option<&'static str>
 {
     match month {
@@ -1748,10 +1757,10 @@ pub fn get_dest_path_and_dir_flag<'a>(paths: &mut Vec<&'a String>) -> Option<(&'
     }
 }
 
-pub fn ask_for_path<P: AsRef<Path>>(s: &str, path: P) -> bool
+pub fn ask(s: &str) -> bool
 {
     loop {
-        eprint!("{} {}? ", s, path.as_ref().to_string_lossy());
+        eprint!("{}? ", s);
         match stderr().flush() {
             Ok(()) => {
                 let mut line = String::new();
@@ -1766,6 +1775,9 @@ pub fn ask_for_path<P: AsRef<Path>>(s: &str, path: P) -> bool
         }
     }
 }
+
+pub fn ask_for_path<P: AsRef<Path>>(s: &str, path: P) -> bool
+{ ask(format!("{} {}", s, path.as_ref().to_string_lossy()).as_str()) }
 
 pub fn str_without_newline(s: &str) -> &str
 {
