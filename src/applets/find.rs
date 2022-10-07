@@ -110,7 +110,7 @@ fn parse_signed_number<T: str::FromStr>(s: &str) -> Option<SignedNumber<T>>
     where <T as str::FromStr>::Err: fmt::Display
 {
     if s.starts_with('+') {
-        match (&s[1..]).parse::<T>() {
+        match s[1..].parse::<T>() {
             Ok(n)    => Some(SignedNumber::Plus(n)),
             Err(err) => {
                 eprintln!("{}", err);
@@ -118,7 +118,7 @@ fn parse_signed_number<T: str::FromStr>(s: &str) -> Option<SignedNumber<T>>
             },
         }
     } else if s.starts_with('-') {
-        match (&s[1..]).parse::<T>() {
+        match s[1..].parse::<T>() {
             Ok(n)    => Some(SignedNumber::Minus(n)),
             Err(err) => {
                 eprintln!("{}", err);
