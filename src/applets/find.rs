@@ -660,7 +660,13 @@ fn evaluate1<P: AsRef<Path>, S: AsRef<OsStr>>(path: P, metadata: &fs::Metadata, 
         },
         Expression::Newer(path2) => {
             match fs::metadata(path2.as_path()) {
-                Ok(metadata2) => (metadata.mtime() > metadata2.mtime(), true),
+                Ok(metadata2) => {
+                    if metadata.mtime() != metadata2.mtime() {
+                        (metadata.mtime() > metadata2.mtime(), true)
+                    } else {
+                        (metadata.mtime_nsec() > metadata2.mtime_nsec(), true)
+                    }
+                },
                 Err(err)      => {
                     eprintln!("{}: {}", path2.as_path().to_string_lossy(), err);
                     (false, false)
