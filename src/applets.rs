@@ -69,6 +69,7 @@ pub mod uname;
 pub mod uniq;
 pub mod unlink;
 pub mod wc;
+pub mod xargs;
 pub mod nonstd;
 
 type AppletFunction = fn(&[String]) -> i32;
@@ -128,6 +129,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("uniq"), uniq::main);
     applet_funs.insert(String::from("unlink"), unlink::main);
     applet_funs.insert(String::from("wc"), wc::main);
+    applet_funs.insert(String::from("xargs"), xargs::main);
     // Non-standard applets.
     applet_funs.insert(String::from("chroot"), nonstd::chroot::main);
     applet_funs.insert(String::from("mknod"), nonstd::mknod::main);
