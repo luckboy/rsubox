@@ -143,7 +143,7 @@ fn command_line_len(prog: &String, args: &[String]) -> usize
 { 
     let mut len = prog.len();
     if !args.is_empty() {
-        len += args.iter().fold(0usize, |sum, a| sum + a.len() + 1) - 1;
+        len += args.iter().fold(0usize, |sum, a| sum + a.len() + 1);
     }
     len
 }
