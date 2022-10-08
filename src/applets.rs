@@ -50,6 +50,7 @@ pub mod mv;
 pub mod nice;
 pub mod nl;
 pub mod nohup;
+pub mod od;
 pub mod paste;
 pub mod printf;
 pub mod pwd;
@@ -110,6 +111,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("nice"), nice::main);
     applet_funs.insert(String::from("nl"), nl::main);
     applet_funs.insert(String::from("nohup"), nohup::main);
+    applet_funs.insert(String::from("od"), od::main);
     applet_funs.insert(String::from("paste"), paste::main);
     applet_funs.insert(String::from("printf"), printf::main);
     applet_funs.insert(String::from("pwd"), pwd::main);
