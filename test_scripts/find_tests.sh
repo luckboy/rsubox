@@ -881,6 +881,24 @@ start_test find "find finds files and directories by exec operand with plus and 
     assert_file_size 13 0 ../test_tmp/stderr.txt
 end_test
 
+start_test find "find finds files and directories by two exec operands with pluses and echo program"
+    mkdir test
+    echo abc > test/abc
+    echo def > test/def
+    mkdir test/test
+    echo ab12 > test/test/ab12
+    echo de34 > test/test/de34
+    mkdir test/abz
+    echo xxx > test/abz/xxx
+    "../$RSUBOX" find test -name abc -exec echo xxx '{}' + -o -name def -exec echo yyy '{}' + > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 = "$?" ] &&
+    assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
+    assert_file_line 3 1 'xxx test/abc' ../test_tmp/stdout.txt &&
+    assert_file_line 4 2 'yyy test/def' ../test_tmp/stdout.txt &&
+    assert_file_size 5 0 ../test_tmp/stderr.txt
+end_test
+
 start_test find "find finds files and directories by ok operand with echo program"
     mkdir test
     echo xxx > test/xxx
@@ -937,6 +955,27 @@ start_test find "find finds files and directories by print operand"
     assert_file_content_pattern 9 '^test/test2 EOL' ../test_tmp/stdout_xargs.txt &&
     assert_file_content_pattern 10 '^test/test2/xxx EOL' ../test_tmp/stdout_xargs.txt &&
     assert_file_size 11 0 ../test_tmp/stderr.txt
+end_test
+
+start_test find "find finds files and directories by print operand and names"
+    mkdir test
+    echo abc > test/abc
+    echo def > test/def
+    mkdir test/test
+    echo ab12 > test/test/ab12
+    echo de34 > test/test/de34
+    mkdir test/abz
+    echo xxx > test/abz/xxx
+    "../$RSUBOX" find test -name 'ab*' -print -o -name 'de*' > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+    status="$?"
+    cat ../test_tmp/stdout.txt | xargs -I arg echo arg EOL > ../test_tmp/stdout_xargs.txt
+
+    assert 1 [ 0 = "$status" ] &&
+    assert_file_line_count 2 3 ../test_tmp/stdout_xargs.txt &&
+    assert_file_content_pattern 3 '^test/abc EOL' ../test_tmp/stdout_xargs.txt &&
+    assert_file_content_pattern 4 '^test/test/ab12 EOL' ../test_tmp/stdout_xargs.txt &&
+    assert_file_content_pattern 5 '^test/abz EOL' ../test_tmp/stdout_xargs.txt &&
+    assert_file_size 6 0 ../test_tmp/stderr.txt
 end_test
 
 start_test find "find finds files and directories by newer operand"
