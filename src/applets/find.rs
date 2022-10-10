@@ -247,7 +247,7 @@ fn parse4(arg_iter: &mut PushbackIter<Skip<slice::Iter<'_, String>>>) -> Option<
                 Some(("p", _)) => Some(Expression::Type(FileType::Fifo)),
                 Some(("s", _)) => Some(Expression::Type(FileType::Socket)),
                 Some((_, _))   => {
-                    eprintln!("Invalit file type");
+                    eprintln!("Invalid file type");
                     None
                 },
                 None                 => {
@@ -603,7 +603,7 @@ fn evaluate1<P: AsRef<Path>, S: AsRef<OsStr>>(path: P, metadata: &fs::Metadata, 
         },
         Expression::XDev => (true, true),
         Expression::Prune => (true, true),
-        Expression::Perm(mode) => (metadata.permissions().mode() == *mode, true),
+        Expression::Perm(mode) => ((metadata.permissions().mode() &  0o7777) == *mode, true),
         Expression::PermMinus(mode) => ((metadata.permissions().mode() & *mode & 0o7777) == *mode, true),
         Expression::Type(FileType::BlockDevice) => (metadata.file_type().is_block_device(), true),
         Expression::Type(FileType::CharDevice) => (metadata.file_type().is_char_device(), true),
@@ -799,7 +799,7 @@ pub fn main(args: &[String]) -> i32
         let fs_dev_r = &mut fs_dev;
         let mut is_success = true;
         let is_success_r = &mut is_success;
-        recursively_do(path, opts.do_flag, true, |path, metadata, name, action| {
+        let is_success2 = recursively_do(path, opts.do_flag, true, |path, metadata, name, action| {
                 match action {
                     DoAction::DirActionBeforeList => {
                         if !expr_opts.depth_flag {
@@ -834,6 +834,7 @@ pub fn main(args: &[String]) -> i32
                     },
                 }
         });
+        is_success &= is_success2;
         if !is_success { status = 1; }
     }
     for exec_plus_data in &expr_opts.exec_plus_data_vec {

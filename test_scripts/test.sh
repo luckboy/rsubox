@@ -49,6 +49,7 @@ start_test_suites
 . ./test_scripts/expand_tests.sh
 . ./test_scripts/expr_tests.sh
 . ./test_scripts/false_tests.sh
+. ./test_scripts/find_tests.sh
 . ./test_scripts/fold_tests.sh
 . ./test_scripts/grep_tests.sh
 . ./test_scripts/head_tests.sh
