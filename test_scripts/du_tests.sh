@@ -34,7 +34,7 @@ start_test du "du prints blocks and directories"
     assert_file_line_pattern 4 2 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 3 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 6 4 '^[0-9][0-9]* \.' ../test_tmp/stdout.txt &&
-    assert_file_size 7 0 ../test_tmp/stderr.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and directories for no deference option"
@@ -71,7 +71,7 @@ start_test du "du prints blocks and directories for no deference option"
     assert_file_line_pattern 6 3 '^[0-9][0-9]* test2/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 4 '^[0-9][0-9]* test2' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 7 5 '^[0-9][0-9]* test3' ../test_tmp/stdout.txt &&
-    assert_file_size 8 0 ../test_tmp/stderr.txt &&
+    assert_file_size 8 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and directories for -H option"
@@ -109,7 +109,7 @@ start_test du "du prints blocks and directories for -H option"
     assert_file_line_pattern 6 4 '^[0-9][0-9]* test2' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 7 5 '^[0-9][0-9]* test3/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 8 6 '^[0-9][0-9]* test3' ../test_tmp/stdout.txt &&
-    assert_file_size 9 0 ../test_tmp/stderr.txt &&
+    assert_file_size 9 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and directories for -H option"
@@ -148,7 +148,7 @@ start_test du "du prints blocks and directories for -H option"
     assert_file_line_pattern 7 5 '^[0-9][0-9]* test2' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 8 6 '^[0-9][0-9]* test3/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 9 7 '^[0-9][0-9]* test3' ../test_tmp/stdout.txt &&
-    assert_file_size 10 0 ../test_tmp/stderr.txt &&
+    assert_file_size 10 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints kilobytes and directories"
@@ -170,7 +170,7 @@ start_test du "du prints kilobytes and directories"
     assert_file_line_pattern 4 2 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 3 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 6 4 '^[0-9][0-9]* \.' ../test_tmp/stdout.txt &&
-    assert_file_size 7 0 ../test_tmp/stderr.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and files and/or directories"
@@ -199,7 +199,7 @@ start_test du "du prints blocks and files and/or directories"
     assert_file_line_pattern 11 9 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&    
     assert_file_line_pattern 12 10 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 13 11 '^[0-9][0-9]* \.' ../test_tmp/stdout.txt &&
-    assert_file_size 14 0 ../test_tmp/stderr.txt &&
+    assert_file_size 14 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints sums"
@@ -222,7 +222,7 @@ start_test du "du prints sums"
     assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^[0-9][0-9]* test1' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 4 2 '^[0-9][0-9]* test2' ../test_tmp/stdout.txt &&
-    assert_file_size 5 0 ../test_tmp/stderr.txt &&
+    assert_file_size 5 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and directories for one filesystem"
@@ -244,7 +244,7 @@ start_test du "du prints blocks and directories for one filesystem"
     assert_file_line_pattern 4 2 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 3 '^[0-9][0-9]* \./..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 6 4 '^[0-9][0-9]* \.' ../test_tmp/stdout.txt &&
-    assert_file_size 7 0 ../test_tmp/stderr.txt &&
+    assert_file_size 7 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du prints blocks and file"
@@ -254,7 +254,7 @@ start_test du "du prints blocks and file"
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 1 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^[0-9][0-9]* xxx' ../test_tmp/stdout.txt &&
-    assert_file_size 4 0 ../test_tmp/stderr.txt &&
+    assert_file_size 4 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du omits one directory for two same directories"
@@ -271,7 +271,7 @@ start_test du "du omits one directory for two same directories"
     assert_file_line_count 2 2 ../test_tmp/stdout.txt &&
     assert_file_line_pattern 3 1 '^[0-9][0-9]* test1/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 4 2 '^[0-9][0-9]* test1' ../test_tmp/stdout.txt &&
-    assert_file_size 5 0 ../test_tmp/stderr.txt &&
+    assert_file_size 5 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du omits one file for two same files"
@@ -286,7 +286,7 @@ start_test du "du omits one file for two same files"
     assert_file_line_pattern 3 1 '^[0-9][0-9]* test1/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 4 2 '^[0-9][0-9]* test1/..*' ../test_tmp/stdout.txt &&
     assert_file_line_pattern 5 3 '^[0-9][0-9]* test1' ../test_tmp/stdout.txt &&
-    assert_file_size 6 0 ../test_tmp/stderr.txt &&
+    assert_file_size 6 0 ../test_tmp/stderr.txt
 end_test
 
 start_test du "du complains on non-existent file"
