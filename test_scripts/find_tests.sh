@@ -939,7 +939,7 @@ start_test find "find finds files and directories by print operand"
     assert_file_size 11 0 ../test_tmp/stderr.txt
 end_test
 
-start_test find "find finds files and directories by print operand"
+start_test find "find finds files and directories by newer operand"
     echo xxx > xxx
     touch -mt 200101020000.00 xxx
     mkdir test
