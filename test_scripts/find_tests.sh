@@ -1263,11 +1263,56 @@ start_test find "find complains on no argument for exec operand"
     assert_file_content 3 'No argument' ../test_tmp/stderr.txt
 end_test
 
-start_test find "find complains on too many {} for exec operand"
+start_test find "find complains on non-existent program for exec operand"
+    echo xxx > xxx
+    "../$RSUBOX" find xxx -exec ./yyy '{}' ';' > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^\./yyy: ' ../test_tmp/stderr.txt
+end_test
+
+start_test find "find complains on too many {} for exec operand with plus"
     echo xxx > xxx
     "../$RSUBOX" find xxx -exec echo '{}' '{}' + > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
     assert 1 [ 0 != "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Only one occurrence of {} is supported' ../test_tmp/stderr.txt
+end_test
+
+start_test find "find complains on non-existent program for exec operand with plus"
+    echo xxx > xxx
+    "../$RSUBOX" find xxx -exec ./yyy '{}' + > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^\./yyy: ' ../test_tmp/stderr.txt
+end_test
+
+start_test find "find complains on no argument for ok operand"
+    echo xxx > xxx
+    echo -n | "../$RSUBOX" find xxx -ok echo > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content 3 'No argument' ../test_tmp/stderr.txt
+end_test
+
+start_test find "find complains on non-existent program for ok operand"
+    echo xxx > xxx
+    echo y | "../$RSUBOX" find xxx -ok ./yyy '{}' ';' > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^\./yyy xxx? ./yyy: ' ../test_tmp/stderr.txt
+end_test
+
+start_test find "find complains on non-existent file for newer operand"
+    echo xxx > xxx
+    "../$RSUBOX" find xxx -newer yyy > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
+
+    assert 1 [ 0 != "$?" ] &&
+    assert_file_size 2 0 ../test_tmp/stdout.txt &&
+    assert_file_content_pattern 3 '^yyy: ' ../test_tmp/stderr.txt
 end_test
