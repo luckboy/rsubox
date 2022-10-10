@@ -112,7 +112,7 @@ start_test du "du prints blocks and directories for -H option"
     assert_file_size 9 0 ../test_tmp/stderr.txt
 end_test
 
-start_test du "du prints blocks and directories for -H option"
+start_test du "du prints blocks and directories for -L option"
     echo xxx > xxx
     mkdir test1
     echo xxx > test1/xxx
