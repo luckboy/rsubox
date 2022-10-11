@@ -399,7 +399,7 @@ end_test
 start_test xargs "xargs complains on non-existent program"
     echo yyy | "../$RSUBOX" xargs ./xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 127 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^\./xxx: ' ../test_tmp/stderr.txt
 end_test
@@ -407,7 +407,7 @@ end_test
 start_test xargs "xargs complains on invalid number of lines"
     echo yyy | "../$RSUBOX" xargs -L xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -415,7 +415,7 @@ end_test
 start_test xargs "xargs complains on number of lines is zero"
     echo yyy | "../$RSUBOX" xargs -L 0 > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Number of lines is zero' ../test_tmp/stderr.txt
 end_test
@@ -423,7 +423,7 @@ end_test
 start_test xargs "xargs complains on invalid number of argument"
     echo yyy | "../$RSUBOX" xargs -n xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -431,7 +431,7 @@ end_test
 start_test xargs "xargs complains on number of argument is zero"
     echo yyy | "../$RSUBOX" xargs -n 0 > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Number of arguments is zero' ../test_tmp/stderr.txt
 end_test
@@ -439,7 +439,7 @@ end_test
 start_test xargs "xargs complains on invalid size"
     echo yyy | "../$RSUBOX" xargs -s xxx > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content_pattern 3 '^invalid digit' ../test_tmp/stderr.txt
 end_test
@@ -447,7 +447,7 @@ end_test
 start_test xargs "xargs complains on size is zero"
     echo yyy | "../$RSUBOX" xargs -s 0 > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt
 
-    assert 1 [ 0 != "$?" ] &&
+    assert 1 [ 1 = "$?" ] &&
     assert_file_size 2 0 ../test_tmp/stdout.txt &&
     assert_file_content 3 'Size is zero' ../test_tmp/stderr.txt
 end_test
