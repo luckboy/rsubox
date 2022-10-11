@@ -80,6 +80,7 @@ start_test_suites
 . ./test_scripts/uniq_tests.sh
 . ./test_scripts/unlink_tests.sh
 . ./test_scripts/wc_tests.sh
+. ./test_scripts/xargs_tests.sh
 # Tests of non-standard applets.
 . ./test_scripts/nonstd/mknod_tests.sh
 . ./test_scripts/nonstd/realpath_tests.sh

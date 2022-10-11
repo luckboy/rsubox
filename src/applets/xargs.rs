@@ -370,6 +370,7 @@ pub fn main(args: &[String]) -> i32
                                             line_count = 0;
                                         }
                                     } else {
+                                        args_from_lines = Vec::new();
                                         line_count = 0;
                                     }
                                     if is_exit { return status; }
