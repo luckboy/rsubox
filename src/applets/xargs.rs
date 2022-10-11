@@ -18,6 +18,7 @@
 use std::fs::*;
 use std::io::*;
 use std::os::unix::process::ExitStatusExt;
+use std::path::*;
 use std::process::*;
 use getopt::Opt;
 use crate::utils::*;
@@ -38,6 +39,7 @@ struct Options
     size: Option<usize>,
     trace_flag: bool,
     exit_flag: bool,
+    question_path_buf: PathBuf,
 }
 
 fn replace_args(args: &[String], s: &String, new_s: &String) -> Vec<String>
@@ -107,7 +109,7 @@ fn get_strings_from_line(s: &str, is_splitting: bool) -> Option<Vec<String>>
     Some(ss)
 }
 
-pub fn ask_for_xargs(prog: &String, args: &[String]) -> bool
+pub fn ask_for_xargs<P: AsRef<Path>>(prog: &String, args: &[String], path: P) -> bool
 {
     loop {
         if !args.is_empty() {
@@ -117,7 +119,7 @@ pub fn ask_for_xargs(prog: &String, args: &[String]) -> bool
         }
         match stderr().flush() {
             Ok(()) => {
-                match File::open("/dev/tty") {
+                match File::open(path.as_ref()) {
                     Ok(file) => {
                         let mut r = LineReader::new(file);
                         let mut line = String::new();
@@ -129,7 +131,7 @@ pub fn ask_for_xargs(prog: &String, args: &[String]) -> bool
                         }
                     },
                     Err(err) => {
-                        eprintln!("/dev/tty: {}", err);
+                        eprintln!("{}: {}", path.as_ref().to_string_lossy(), err);
                         return false;
                     },
                 }
@@ -183,7 +185,7 @@ fn trace_command(prog: &String, args: &[String])
 fn spawn_command(prog: &String, args: &[String], opts: &Options) -> i32
 {
     let reply = if opts.prompt_mode_flag {
-        ask_for_xargs(prog, args)
+        ask_for_xargs(prog, args, opts.question_path_buf.as_path())
     } else {
         true
     };
@@ -215,7 +217,7 @@ fn spawn_command(prog: &String, args: &[String], opts: &Options) -> i32
 
 pub fn main(args: &[String]) -> i32
 {
-    let mut opt_parser = getopt::Parser::new(args, "E:I:L:n:ps:tx");
+    let mut opt_parser = getopt::Parser::new(args, "E:I:L:n:ps:T:tx");
     let mut opts = Options {
         eof: None,
         command_flag: CommandFlag::None,
@@ -223,6 +225,7 @@ pub fn main(args: &[String]) -> i32
         size: None,
         trace_flag: false,
         exit_flag: false,
+        question_path_buf: PathBuf::from("/dev/tty"),
     };
     loop {
         match opt_parser.next() {
@@ -286,6 +289,11 @@ pub fn main(args: &[String]) -> i32
             },
             Some(Ok(Opt('s', None))) => {
                 eprintln!("option requires an argument -- 's'");
+                return 1;
+            },
+            Some(Ok(Opt('T', Some(opt_arg)))) => opts.question_path_buf = PathBuf::from(opt_arg),
+            Some(Ok(Opt('T', None))) => {
+                eprintln!("option requires an argument -- 'T'");
                 return 1;
             },
             Some(Ok(Opt('t', _))) => opts.trace_flag = true,
@@ -397,7 +405,7 @@ pub fn main(args: &[String]) -> i32
                         }
                         if is_eof { break; }
                     },
-                    None => break,
+                    None => (),
                 }
             },
             Err(err) => {
