@@ -374,7 +374,7 @@ start_test xargs "xargs complains and quits for number of arguments, size and ex
     assert_file_content 5 'Too long command line' ../test_tmp/stderr.txt
 end_test
 
-start_test xargs "xargs complains on unclosed single quotation"
+start_test xargs "xargs complains on unclosed single quote"
     echo "'"'xxx' > test.txt
     echo xxx yyy >> test.txt
     cat test.txt | "../$RSUBOX" xargs echo > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
@@ -382,10 +382,10 @@ start_test xargs "xargs complains on unclosed single quotation"
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 1 ../test_tmp/stdout.txt &&
     assert_file_line 3 1 'xxx yyy' ../test_tmp/stdout.txt &&
-    assert_file_content 4 'Unclosed single quotation' ../test_tmp/stderr.txt
+    assert_file_content 4 'Unclosed single quote' ../test_tmp/stderr.txt
 end_test
 
-start_test xargs "xargs complains on unclosed double quotation"
+start_test xargs "xargs complains on unclosed double quote"
     echo '"xxx' > test.txt
     echo xxx yyy >> test.txt
     cat test.txt | "../$RSUBOX" xargs echo > ../test_tmp/stdout.txt 2> ../test_tmp/stderr.txt 
@@ -393,7 +393,7 @@ start_test xargs "xargs complains on unclosed double quotation"
     assert 1 [ 0 = "$?" ] &&
     assert_file_line_count 2 1 ../test_tmp/stdout.txt &&
     assert_file_line 3 1 'xxx yyy' ../test_tmp/stdout.txt &&
-    assert_file_content 4 'Unclosed double quotation' ../test_tmp/stderr.txt
+    assert_file_content 4 'Unclosed double quote' ../test_tmp/stderr.txt
 end_test
 
 start_test xargs "xargs complains on non-existent program"

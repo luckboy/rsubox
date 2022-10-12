@@ -63,7 +63,7 @@ fn get_strings_from_line(s: &str, is_splitting: bool) -> Option<Vec<String>>
                             is_last_s_to_pop = false;
                         },
                         None       => {
-                            eprintln!("Unclosed single quotation");
+                            eprintln!("Unclosed single quote");
                             return None;
                         },
                     }
@@ -79,7 +79,7 @@ fn get_strings_from_line(s: &str, is_splitting: bool) -> Option<Vec<String>>
                             is_last_s_to_pop = false;
                         },
                         None       => {
-                            eprintln!("Unclosed double quotation");
+                            eprintln!("Unclosed double quote");
                             return None;
                         },
                     }
