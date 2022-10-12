@@ -63,6 +63,7 @@ start_test_suites
 . ./test_scripts/nice_tests.sh
 . ./test_scripts/nl_tests.sh
 . ./test_scripts/nohup_tests.sh
+. ./test_scripts/od_tests.sh
 . ./test_scripts/paste_tests.sh
 . ./test_scripts/printf_tests.sh
 . ./test_scripts/pwd_tests.sh

@@ -24,6 +24,7 @@ use std::path::*;
 use getopt::Opt;
 use crate::utils::*;
 
+#[derive(PartialEq)]
 enum AddressBase
 {
     None,
@@ -482,7 +483,7 @@ fn print_bytes<W: Write>(w: &mut W, bytes: &[u8], type_and_width: &TypeAndWidth,
         },
         Type::Float(FloatSize::Single) => {
             let n = bytes_to_f32(bytes, opts.endian);
-            let s = if n <= 1.0e13 && n >= 0.0001 {
+            let s = if n.abs() < 1.0e9 && n.abs() >= 1.0e-4 {
                 format!("{:>15}", n)
             } else {
                 format!("{:>15e}", n)
@@ -491,7 +492,7 @@ fn print_bytes<W: Write>(w: &mut W, bytes: &[u8], type_and_width: &TypeAndWidth,
         },
         Type::Float(FloatSize::Double) => {
             let n = bytes_to_f64(bytes, opts.endian);
-            let s = if n <= 1.0e22 && n >= 1.0e-4 {
+            let s = if n.abs() < 1.0e17 && n.abs() >= 1.0e-4 {
                 format!("{:>24}", n)
             } else {
                 format!("{:>24e}", n)
@@ -533,6 +534,7 @@ fn print_data(data: &mut Data, opts: &Options, special_char_names: &HashMap<u8, 
         let addr = data.addr;
         let mut buf: Vec<u8> = vec![0; 16];
         let (count, tmp_is_success) = read_buf_from_data(data, buf.as_mut_slice(), &mut counter);
+        is_success &= tmp_is_success;
         if count == 0 { break; }
         let is_duplication = if !opts.output_duplication_flag && count == 16 {
             match &prev_buf {
@@ -567,11 +569,12 @@ fn print_data(data: &mut Data, opts: &Options, special_char_names: &HashMap<u8, 
             }
             is_first_duplication = false;
         }
-        is_success = tmp_is_success;
         prev_buf = Some(buf);
     }
-    if !print_addr(data.addr, &mut w, opts) { return false; }
-    if !print_newline(&mut w) { return false; }
+    if opts.addr_base != AddressBase::None {
+        if !print_addr(data.addr, &mut w, opts) { return false; }
+        if !print_newline(&mut w) { return false; }
+    }
     match w.flush() {
         Ok(())   => (),
         Err(err) => {
