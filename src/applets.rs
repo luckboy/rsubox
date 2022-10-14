@@ -24,6 +24,7 @@ pub mod chmod;
 pub mod chown;
 pub mod cksum;
 pub mod cmp;
+pub mod comm;
 pub mod cp;
 pub mod cut;
 pub mod date;
@@ -85,6 +86,7 @@ pub fn initialize_applet_funs(applet_funs: &mut HashMap<String, AppletFunction>)
     applet_funs.insert(String::from("chown"), chown::main);
     applet_funs.insert(String::from("cksum"), cksum::main);
     applet_funs.insert(String::from("cmp"), cmp::main);
+    applet_funs.insert(String::from("comm"), comm::main);
     applet_funs.insert(String::from("cp"), cp::main);
     applet_funs.insert(String::from("cut"), cut::main);
     applet_funs.insert(String::from("date"), date::main);
