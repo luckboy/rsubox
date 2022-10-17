@@ -37,6 +37,7 @@ start_test_suites
 . ./test_scripts/chmod_tests.sh
 . ./test_scripts/chown_tests.sh
 . ./test_scripts/cksum_tests.sh
+. ./test_scripts/comm_tests.sh
 . ./test_scripts/cmp_tests.sh
 . ./test_scripts/cp_tests.sh
 . ./test_scripts/cut_tests.sh
