@@ -573,7 +573,7 @@ fn entries_to_long_format_entries(entries: &[DoEntry], opts: &Options, current_t
                 None
             };
             let size = if entry.metadata.file_type().is_block_device() || entry.metadata.file_type().is_char_device() {
-               format!("{}, {}", major(entry.metadata.rdev()), minor(entry.metadata.rdev()))
+               format!("{}, {:3}", major(entry.metadata.rdev()), minor(entry.metadata.rdev()))
             }  else {
                format!("{}", entry.metadata.size())
             };
