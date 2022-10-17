@@ -572,7 +572,11 @@ fn entries_to_long_format_entries(entries: &[DoEntry], opts: &Options, current_t
             } else {
                 None
             };
-            let size = format!("{}", entry.metadata.size());
+            let size = if entry.metadata.file_type().is_block_device() || entry.metadata.file_type().is_char_device() {
+               format!("{}, {}", major(entry.metadata.rdev()), minor(entry.metadata.rdev()))
+            }  else {
+               format!("{}", entry.metadata.size())
+            };
             let time_sec = match opts.time_flag {
                 TimeFlag::LastAccess           => entry.metadata.atime(),
                 TimeFlag::LastDataModification => entry.metadata.mtime(),
