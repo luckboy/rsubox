@@ -408,7 +408,7 @@ fn print_bytes<W: Write>(w: &mut W, bytes: &[u8], type_and_width: &TypeAndWidth,
                 '\r'   => write!(w, " {:>width$}", "\\r", width = type_and_width.width),
                 '\t'   => write!(w, " {:>width$}", "\\t", width = type_and_width.width),
                 c      => {
-                    if c.is_ascii_graphic() || c.is_ascii_whitespace() {
+                    if c.is_ascii_graphic() || c == ' ' {
                         write!(w, " {:>width$}", c, width = type_and_width.width)
                     } else {
                         let s = format!("{:0>3o}", bytes[0]);
