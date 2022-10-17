@@ -630,7 +630,7 @@ fn calculate_long_format_max_lens(format_entries: &[LongFormatEntry]) -> LongFor
             None    => (),
         }
         match &format_entry.group {
-            Some(s) => max_lens.max_group_len = Some(max(max_lens.max_owner_len.unwrap_or(0), s.as_str().chars().fold(0, |x, _| x + 1))),
+            Some(s) => max_lens.max_group_len = Some(max(max_lens.max_group_len.unwrap_or(0), s.as_str().chars().fold(0, |x, _| x + 1))),
             None    => (),
         }
         max_lens.max_size_len = max(max_lens.max_size_len, format_entry.size.as_str().chars().fold(0, |x, _| x + 1 ));
