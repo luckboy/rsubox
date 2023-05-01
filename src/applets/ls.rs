@@ -1,6 +1,6 @@
 //
 // Rsubox - Rust single unix utilities in one executable.
-// Copyright (C) 2022 Łukasz Szpakowski
+// Copyright (C) 2022-2023 Łukasz Szpakowski
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -737,10 +737,10 @@ fn ls_files(is_dir_path: bool, entries: &[DoEntry], opts: &Options, current_tm: 
 
 fn get_column_count() -> usize
 {
-    let mut size: libc::winsize = unsafe { MaybeUninit::uninit().assume_init() };
-    let res = unsafe { libc::ioctl(1, libc::TIOCGWINSZ, &mut size as *mut libc::winsize) };
+    let mut size = MaybeUninit::<libc::winsize>::uninit();
+    let res = unsafe { libc::ioctl(1, libc::TIOCGWINSZ, size.assume_init_mut() as *mut libc::winsize) };
     if res != -1 {
-        size.ws_col as usize
+        (unsafe { size.assume_init_ref().ws_col }) as usize
     } else {
         80
     }

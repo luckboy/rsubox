@@ -1,6 +1,6 @@
 //
 // Rsubox - Rust single unix utilities in one executable.
-// Copyright (C) 2022 Łukasz Szpakowski
+// Copyright (C) 2022-2023 Łukasz Szpakowski
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -320,22 +320,22 @@ impl<R: Read> LineRead for LineReader<R>
 
 pub struct Regex
 {
-    libc_regex: libc::regex_t,
+    libc_regex: MaybeUninit<libc::regex_t>,
 }
 
 impl Regex
 {
     pub fn new<S: AsRef<OsStr>>(pattern: S, flags: i32) -> RegexResult
     {
-        let mut regex: Regex = unsafe { MaybeUninit::uninit().assume_init() };
+        let mut regex: Regex = Regex { libc_regex: MaybeUninit::uninit(), };
         let pattern_cstring = CString::new(pattern.as_ref().as_bytes()).unwrap();
-        let libc_regex_err = unsafe { libc::regcomp(&mut regex.libc_regex as *mut libc::regex_t, pattern_cstring.as_ptr(), flags) };
+        let libc_regex_err = unsafe { libc::regcomp(regex.libc_regex.assume_init_mut() as *mut libc::regex_t, pattern_cstring.as_ptr(), flags) };
         if libc_regex_err == 0 {
             Ok(regex)
         } else {
-            let size = unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, null_mut(), 0) };
+            let size = unsafe { libc::regerror(libc_regex_err, regex.libc_regex.assume_init_ref() as *const libc::regex_t, null_mut(), 0) };
             let mut err_buf: Vec<u8> = vec![0; size];
-            unsafe { libc::regerror(libc_regex_err, &regex.libc_regex as *const libc::regex_t, err_buf.as_mut_ptr() as *mut libc::c_char, size); };
+            unsafe { libc::regerror(libc_regex_err, regex.libc_regex.assume_init_ref() as *const libc::regex_t, err_buf.as_mut_ptr() as *mut libc::c_char, size); };
             Err(RegexError {
                     libc_regex_error: libc_regex_err,
                     message: CStr::from_bytes_with_nul(err_buf.as_slice()).unwrap().to_string_lossy().into_owned(),
@@ -352,7 +352,7 @@ impl Regex
                     rm_so: -1 as libc::regoff_t,
                     rm_eo: -1 as libc::regoff_t,
                 }; count];
-                let libc_regex_err = unsafe { libc::regexec(&self.libc_regex as *const libc::regex_t, s_cstring.as_ptr(), count, match_buf.as_mut_ptr(), flags) };
+                let libc_regex_err = unsafe { libc::regexec(self.libc_regex.assume_init_ref() as *const libc::regex_t, s_cstring.as_ptr(), count, match_buf.as_mut_ptr(), flags) };
                 if libc_regex_err == 0 {
                     for m in &match_buf {
                         if m.rm_so == -1 && m.rm_eo == -1 { break; }
@@ -364,7 +364,7 @@ impl Regex
                 }
             },
             None => {
-                let libc_regex_err = unsafe { libc::regexec(&self.libc_regex as *const libc::regex_t, s_cstring.as_ptr(), 0, null_mut(), flags) };
+                let libc_regex_err = unsafe { libc::regexec(self.libc_regex.assume_init_ref() as *const libc::regex_t, s_cstring.as_ptr(), 0, null_mut(), flags) };
                 libc_regex_err == 0
             },
         }
@@ -374,7 +374,7 @@ impl Regex
 impl Drop for Regex
 {
     fn drop(&mut self)
-    { unsafe { libc::regfree(&mut self.libc_regex as *mut libc::regex_t); }; }
+    { unsafe { libc::regfree(self.libc_regex.assume_init_mut() as *mut libc::regex_t); }; }
 }
 
 #[derive(Copy, Clone)]
@@ -1240,20 +1240,20 @@ pub fn nice(inc: i32) -> Result<i32>
 
 pub fn uname() -> Result<Utsname>
 {
-    let mut libc_name: libc::utsname = unsafe { MaybeUninit::uninit().assume_init() };
-    let res = unsafe { libc::uname(&mut libc_name as *mut libc::utsname) };
+    let mut libc_name: MaybeUninit<libc::utsname> = MaybeUninit::uninit();
+    let res = unsafe { libc::uname(libc_name.assume_init_mut() as *mut libc::utsname) };
     if res != -1 {
-        let sysname_len = unsafe { libc::strlen(libc_name.sysname.as_ptr() as *const libc::c_char) };
-        let nodename_len = unsafe { libc::strlen(libc_name.nodename.as_ptr() as *const libc::c_char) };
-        let release_len = unsafe { libc::strlen(libc_name.release.as_ptr() as *const libc::c_char) };
-        let version_len = unsafe { libc::strlen(libc_name.version.as_ptr() as *const libc::c_char) };
-        let machine_len = unsafe { libc::strlen(libc_name.machine.as_ptr() as *const libc::c_char) };
+        let sysname_len = unsafe { libc::strlen(libc_name.assume_init_ref().sysname.as_ptr() as *const libc::c_char) };
+        let nodename_len = unsafe { libc::strlen(libc_name.assume_init_ref().nodename.as_ptr() as *const libc::c_char) };
+        let release_len = unsafe { libc::strlen(libc_name.assume_init_ref().release.as_ptr() as *const libc::c_char) };
+        let version_len = unsafe { libc::strlen(libc_name.assume_init_ref().version.as_ptr() as *const libc::c_char) };
+        let machine_len = unsafe { libc::strlen(libc_name.assume_init_ref().machine.as_ptr() as *const libc::c_char) };
         let name = Utsname {
-            sysname: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.sysname.as_ptr() as *const u8, sysname_len) })),
-            nodename: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.nodename.as_ptr() as *const u8, nodename_len) })),
-            release: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.release.as_ptr() as *const u8, release_len) })),
-            version: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.version.as_ptr() as *const u8, version_len) })),
-            machine: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.machine.as_ptr() as *const u8, machine_len) })),
+            sysname: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.assume_init_ref().sysname.as_ptr() as *const u8, sysname_len) })),
+            nodename: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.assume_init_ref().nodename.as_ptr() as *const u8, nodename_len) })),
+            release: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.assume_init_ref().release.as_ptr() as *const u8, release_len) })),
+            version: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.assume_init_ref().version.as_ptr() as *const u8, version_len) })),
+            machine: OsString::from(&OsStr::from_bytes(unsafe { from_raw_parts(libc_name.assume_init_ref().machine.as_ptr() as *const u8, machine_len) })),
         };
         Ok(name)
     } else {
@@ -1393,11 +1393,11 @@ fn tm_to_libc_tm(tm: &Tm) -> libc::tm
 
 pub fn gmtime(time: i64) -> Result<Tm>
 {
-    let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
+    let mut libc_tm: MaybeUninit<libc::tm> = MaybeUninit::uninit();
     let libc_time = time as libc::time_t;
-    let res = unsafe { libc::gmtime_r(&libc_time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    let res = unsafe { libc::gmtime_r(&libc_time as *const libc::time_t, libc_tm.assume_init_mut() as *mut libc::tm) };
     if !res.is_null() {
-        Ok(libc_tm_to_tm(&libc_tm))
+        Ok(libc_tm_to_tm(unsafe { libc_tm.assume_init_ref() }))
     } else {
         Err(Error::last_os_error())
     }
@@ -1405,11 +1405,11 @@ pub fn gmtime(time: i64) -> Result<Tm>
 
 pub fn localtime(time: i64) -> Result<Tm>
 {
-    let mut libc_tm: libc::tm = unsafe { MaybeUninit::uninit().assume_init() };
+    let mut libc_tm: MaybeUninit<libc::tm> = MaybeUninit::uninit();
     let libc_time = time as libc::time_t;
-    let res = unsafe { libc::localtime_r(&libc_time as *const libc::time_t, &mut libc_tm as *mut libc::tm) };
+    let res = unsafe { libc::localtime_r(&libc_time as *const libc::time_t, libc_tm.assume_init_mut() as *mut libc::tm) };
     if !res.is_null() {
-        Ok(libc_tm_to_tm(&libc_tm))
+        Ok(libc_tm_to_tm(unsafe { libc_tm.assume_init_ref() }))
     } else {
         Err(Error::last_os_error())
     }
